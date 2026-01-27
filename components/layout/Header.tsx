@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Menu, Search, Sun, Moon } from "lucide-react";
+import { useEffect, useState } from "react";
+
 
 const navItems = [
    { label: "Dashboard", href: "/" },
@@ -17,14 +19,19 @@ function cx(...classes: Array<string | false | undefined>) {
 
 export default function Header() {
    const pathname = usePathname();
+   const [dark, setDark] = useState(false);
+
+   useEffect(() => {
+      document.documentElement.classList.toggle("dark", dark);
+   }, [dark]);
 
    return (
-      <header className="sticky top-0 z-50 border-b bg-white/70 backdrop-blur dark:bg-black/30">
+      <header className="sticky top-0 z-50 border-b border-border bg-bg/70 backdrop-blur">
          <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4">
             {/* Mobile */}
             <button
                type="button"
-               className="inline-flex h-10 w-10 items-center justify-center rounded-lg border md:hidden"
+               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border md:hidden"
                aria-label="Open menu"
             >
                <Menu className="h-5 w-5" />
@@ -70,10 +77,20 @@ export default function Header() {
                />
             </div>
 
+            <button
+               type="button"
+               onClick={() => setDark((v) => !v)}
+               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
+               aria-label="Toggle theme"
+            >
+               {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
+
             {/* Notifications */}
             <button
                type="button"
-               className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border"
+               className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
                aria-label="Notifications"
             >
                <Bell className="h-5 w-5" />
@@ -85,7 +102,7 @@ export default function Header() {
             {/* Avatar */}
             <button
                type="button"
-               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-linear-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white"
+               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-linear-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white"
                aria-label="User menu"
             >
                A
