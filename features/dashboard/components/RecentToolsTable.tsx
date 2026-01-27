@@ -12,8 +12,8 @@ export default function RecentToolsTable() {
    }
 
    return (
-      <Table>
-         <THead>
+      <Table className="bg-surface">
+         <THead className="bg-surface">
             <tr>
                <TH>Tool</TH>
                <TH>Department</TH>
@@ -30,9 +30,7 @@ export default function RecentToolsTable() {
                   <TD>{tool.active_users_count}</TD>
                   <TD className="text-right">€{tool.monthly_cost}</TD>
                   <TD>
-                     <StatusBadge status={tool.status}>
-                        {tool.status}
-                     </StatusBadge>
+                     <StatusBadge status={tool.status} />
                   </TD>
                </TR>
             ))}

@@ -7,13 +7,13 @@ import { Building2, TrendingUp, Users, Wrench } from "lucide-react";
 
 /* ---------- UI helpers (spécifiques KPI) ---------- */
 
-type Tone = "green" | "purple" | "orange" | "pink";
+type Tone = "green" | "purple" | "orangered" | "redpink";
 
 const tones: Record<Tone, string> = {
    green: "bg-emerald-500",
    purple: "bg-indigo-500",
-   orange: "bg-orange-500",
-   pink: "bg-pink-500",
+   orangered: "bg-gradient-to-br from-orange-500 to-red-600",
+   redpink: "bg-gradient-to-br from-pink-400 to-red-700",
 };
 
 function TrendPill({
@@ -112,7 +112,7 @@ export default function KpiCards() {
       {
          key: "departments",
          label: "Departments",
-         tone: "orange" as const,
+         tone: "orangered" as const,
          icon: Building2,
          value: kpi_trends.departments_change
             ? budget_overview.departments ?? "_"
@@ -122,7 +122,7 @@ export default function KpiCards() {
       {
          key: "cpu",
          label: "Cost/User",
-         tone: "pink" as const,
+         tone: "redpink" as const,
          icon: Users,
          value: `€${cost_analytics.cost_per_user}`,
          trend: kpi_trends.cost_per_user_change,

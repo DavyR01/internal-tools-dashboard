@@ -26,7 +26,7 @@ export default function Header() {
    }, [dark]);
 
    return (
-      <header className="sticky top-0 z-50 border-b border-border bg-bg/70 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
          <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4">
             {/* Mobile */}
             <button

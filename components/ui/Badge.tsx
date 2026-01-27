@@ -3,10 +3,14 @@ import { cn } from "@/lib/utils/cn";
 type Status = "active" | "expiring" | "unused";
 
 const styles: Record<Status, string> = {
-   active: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-   expiring: "bg-orange-500/15 text-orange-400 border-orange-500/30",
-   unused: "bg-rose-500/15 text-rose-400 border-rose-500/30",
+   active: "bg-emerald-500 text-white border-emerald-500/30",
+   expiring: "bg-gradient-to-br from-orange-300 to-orange-500 text-white border-orange-500/30",
+   unused: "bg-gradient-to-br from-red-400 to-red-700 text-white border-red-500/30",
 };
+
+export const formatStatus = (status: Status) =>
+   status.charAt(0).toUpperCase() + status.slice(1);
+
 
 export function StatusBadge({
    status,
@@ -25,7 +29,7 @@ export function StatusBadge({
             className
          )}
       >
-         {children ?? status}
+         {children ?? formatStatus(status)}
       </span>
    );
 }

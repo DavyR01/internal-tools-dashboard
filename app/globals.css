@@ -1,9 +1,12 @@
+@config "../tailwind.config.ts";
 @import "tailwindcss";
 
 /* Base tokens (Light) */
 :root {
    --bg: 252 252 255;
-   --surface: 250 250 252;
+   /* Primary surfaces (cards, tables, header) */
+   --surface: 255 255 255;
+   /* Raised surfaces (modals, dropdowns, popovers) */
    --elevated: 255 255 255;
 
    --text: 17 17 19;
