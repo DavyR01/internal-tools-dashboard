@@ -47,14 +47,16 @@ export default function ToolsTable({
             <Table>
                <THead>
                   <TR className="border-t-0">
-                     <TH>Tool</TH>
+                     <TH className="sticky left-0 z-20 bg-surface">Tool</TH>
                      <TH>Category</TH>
                      <TH>Department</TH>
                      <TH className="text-right whitespace-nowrap">Users</TH>
                      <TH className="text-right whitespace-nowrap">Monthly cost</TH>
                      <TH className="text-right whitespace-nowrap">Last update</TH>
                      <TH>Status</TH>
-                     <TH className="text-right whitespace-nowrap">Actions</TH>
+                     <TH className="sticky right-0 z-20 bg-surface text-right whitespace-nowrap">
+                        Actions
+                     </TH>
                   </TR>
                </THead>
 
@@ -76,7 +78,7 @@ export default function ToolsTable({
                   ) : (
                      tools.map((tool) => (
                         <TR key={tool.id}>
-                           <TD>
+                           <TD className="sticky left-0 z-10 bg-surface">
                               <div className="flex items-center gap-3">
                                  <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-xl bg-elevated flex items-center justify-center">
                                     <img
@@ -114,7 +116,7 @@ export default function ToolsTable({
                            <TD>
                               <StatusBadge status={tool.status} />
                            </TD>
-                           <TD className="text-right whitespace-nowrap">
+                           <TD className="sticky right-0 z-10 bg-surface text-right whitespace-nowrap">
                               <div className="inline-flex items-center gap-2">
                                  <Button variant="secondary">
                                     View
