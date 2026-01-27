@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Modal } from "@/components/ui/Modal";
 import ToolsTable from "./ToolsTable";
 import {
    useDepartments,
@@ -15,6 +14,8 @@ import {
    SortOrder,
    useUpdateTool,
 } from "../queries";
+import ToolViewModal from "./ToolViewModal";
+import ToolEditModal from "./ToolEditModal";
 
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
@@ -256,133 +257,28 @@ export default function ToolsCatalog() {
 
             {/* ---- Modals ---- */}
             {modal?.mode === "view" ? (
-               <Modal open onClose={closeModal} title="Tool details">
-                  <div className="space-y-4 text-sm">
-                     <div>
-                        <div className="text-xs text-muted">Name</div>
-                        <div className="font-medium">{modal.tool.name}</div>
-                     </div>
-
-                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                           <div className="text-xs text-muted">Category</div>
-                           <div>{modal.tool.category ?? "—"}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Vendor</div>
-                           <div>{modal.tool.vendor ?? "—"}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Department</div>
-                           <div>{modal.tool.owner_department ?? "—"}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Status</div>
-                           <div>{modal.tool.status}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Users</div>
-                           <div>{modal.tool.active_users_count ?? "—"}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Monthly cost</div>
-                           <div>
-                              {typeof modal.tool.monthly_cost === "number"
-                                 ? `${modal.tool.monthly_cost} €`
-                                 : "—"}
-                           </div>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div className="text-xs text-muted">Description</div>
-                        <div className="text-muted">{modal.tool.description ?? "—"}</div>
-                     </div>
-
-                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                           <div className="text-xs text-muted">Created</div>
-                           <div>{formatDate(modal.tool.created_at)}</div>
-                        </div>
-                        <div>
-                           <div className="text-xs text-muted">Last update</div>
-                           <div>{formatDate(modal.tool.updated_at)}</div>
-                        </div>
-                     </div>
-
-                     {modal.tool.website_url ? (
-                        <div>
-                           <div className="text-xs text-muted">Website</div>
-                           <a
-                              href={modal.tool.website_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-sm underline underline-offset-4"
-                           >
-                              {modal.tool.website_url}
-                           </a>
-                        </div>
-                     ) : null}
-
-                     <div className="flex justify-end gap-2 pt-2">
-                        <Button variant="secondary" onClick={closeModal}>
-                           Close
-                        </Button>
-                     </div>
-                  </div>
-               </Modal>
+               <ToolViewModal
+                  open={modal?.mode === "view"}
+                  tool={modal?.tool ?? null}
+                  onClose={closeModal}
+               />
             ) : null}
 
             {modal?.mode === "edit" ? (
-               <Modal open onClose={closeModal} title="Edit tool">
-                  <div className="space-y-4">
-                     <div className="space-y-1">
-                        <div className="text-xs text-muted">Name</div>
-                        <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
-                     </div>
-
-                     <div className="space-y-1">
-                        <div className="text-xs text-muted">Monthly cost (€)</div>
-                        <input
-                           className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
-                           type="number"
-                           value={editMonthlyCost}
-                           onChange={(e) =>
-                              setEditMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
-                           }
-                        />
-                     </div>
-
-                     <div className="space-y-1">
-                        <div className="text-xs text-muted">Status</div>
-                        <select
-                           className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
-                           value={editStatus}
-                           onChange={(e) => setEditStatus(e.target.value as ToolStatus)}
-                        >
-                           <option value="active">Active</option>
-                           <option value="expiring">Expiring</option>
-                           <option value="unused">Unused</option>
-                        </select>
-                     </div>
-
-                     {updateTool.isError ? (
-                        <div className="rounded-xl border border-border/30 bg-elevated/50 p-3 text-sm">
-                           <div className="font-medium">Couldn’t save changes</div>
-                           <div className="text-muted">Please retry.</div>
-                        </div>
-                     ) : null}
-
-                     <div className="flex justify-end gap-2 pt-2">
-                        <Button variant="secondary" onClick={closeModal} disabled={updateTool.isPending}>
-                           Cancel
-                        </Button>
-                        <Button onClick={onSaveEdit} disabled={updateTool.isPending}>
-                           {updateTool.isPending ? "Saving…" : "Save"}
-                        </Button>
-                     </div>
-                  </div>
-               </Modal>
+               <ToolEditModal
+                  open={modal?.mode === "edit"}
+                  tool={modal?.tool ?? null}
+                  onClose={closeModal}
+                  isSaving={updateTool.isPending}
+                  isError={updateTool.isError}
+                  onSave={(patch) => {
+                     if (!modal?.tool) return;
+                     updateTool.mutate(
+                        { id: modal.tool.id, patch },
+                        { onSuccess: closeModal }
+                     );
+                  }}
+               />
             ) : null}
          </CardContent>
       </Card>
