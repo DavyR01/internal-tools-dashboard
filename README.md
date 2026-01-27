@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Internal Tools Management Dashboard
 
-## Getting Started
+## 🚀 Quick Start
 
-First, run the development server:
+Ce projet est une application frontend développée avec Next.js permettant de monitorer et gérer les outils SaaS internes d’une entreprise.
+
+### Installation
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Accès
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* `/` : Dashboard
+* `/tools` : Tools (Jour 7)
+* `/analytics` : Analytics (Jour 8)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🏗️ Architecture
 
-To learn more about Next.js, take a look at the following resources:
+L’architecture repose sur une séparation claire des responsabilités :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **routing** géré par Next.js (App Router),
+* **composants UI réutilisables**,
+* **logique métier par feature**,
+* **data fetching centralisé**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Structure principale :
 
-## Deploy on Vercel
+```
+app/                # Routes (Dashboard, Tools, Analytics)
+components/         # Design system et layout partagé
+features/           # Logique par domaine (dashboard, tools, analytics)
+lib/                # API, React Query, utilitaires
+store/              # UI state global (Zustand)
+styles/             # Styles globaux et tokens
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎨 Design System Evolution
+
+Le design system est construit dès le **Jour 6** à partir des mockups fournis (dark & light mode) et sert de **fondation obligatoire** pour les Jours 7 et 8.
+
+Principes clés :
+
+* tokens globaux (couleurs, backgrounds, textes, bordures),
+* composants UI uniques et réutilisés partout,
+* aucune réinvention visuelle après le Jour 6.
+
+Les composants principaux incluent :
+
+* Card / Button / Badge / Input / Table,
+* Header et layout communs,
+* status system cohérent (Active / Expiring / Unused).
+
+---
+
+## 🔗 Navigation & User Journey
+
+Le parcours utilisateur est pensé comme un flux logique :
+
+**Dashboard → Tools → Analytics**
+
+* Le Dashboard fournit une vue globale (KPIs, outils récents),
+* La page Tools permet la gestion détaillée des outils SaaS,
+* La page Analytics apporte des insights coûts et usage.
+
+La navigation est assurée par un header unique partagé sur les trois pages.
+
+---
+
+## 📊 Data Integration Strategy
+
+Toutes les données proviennent d’un backend **JSON Server**.
+
+Stratégie :
+
+* **Axios** comme client HTTP,
+* **TanStack Query** pour la gestion du server state,
+* cache, refetch et loading states gérés automatiquement.
+
+Cette approche garantit :
+
+* une séparation claire entre UI state et données serveur,
+* une base scalable pour filtres, pagination et mutations (CRUD).
+
+---
+
+## 📱 Progressive Responsive Design
+
+L’application suit une approche **mobile-first** avec des breakpoints progressifs :
+
+* Mobile : layouts empilés, menu hamburger,
+* Tablet : grilles intermédiaires, filtres adaptatifs,
+* Desktop : dashboards complets et interactions avancées.
+
+Les composants du design system sont conçus pour s’adapter naturellement à ces contraintes.
+
+---
+
+## 🧪 Testing Strategy
+
+Le projet est structuré pour permettre :
+
+* des tests unitaires ciblés sur les composants clés,
+* une validation visuelle forte du design system,
+* une réduction des régressions grâce à la réutilisation stricte des composants.
+
+---
+
+## ⚡ Performance Optimizations
+
+Plusieurs choix visent à garantir de bonnes performances :
+
+* React Query pour limiter les requêtes inutiles,
+* découpage par features pour réduire les dépendances,
+* composants UI simples et peu coûteux en rendu.
+
+---
+
+## 🎯 Design Consistency Approach
+
+La cohérence visuelle est assurée par :
+
+* un design system centralisé,
+* des tokens globaux uniques,
+* des patterns UI identiques entre Dashboard, Tools et Analytics.
+
+Après le Jour 6, aucune nouvelle règle visuelle n’est introduite, seulement des extensions contrôlées.
+
+---
+
+## 📈 Data Visualization Philosophy
+
+La data visualisation (Jour 8) repose sur :
+
+* **Recharts** comme librairie de graphiques,
+* une intégration stricte au design system existant,
+* des visualisations orientées lisibilité et prise de décision.
+
+---
+
+## 🔮 Next Steps / Complete App Vision
+
+Les évolutions possibles incluent :
+
+* alertes intelligentes de coûts,
+* recommandations d’optimisation SaaS,
+* projections budgétaires,
+* export de rapports,
+* mises à jour temps réel.
