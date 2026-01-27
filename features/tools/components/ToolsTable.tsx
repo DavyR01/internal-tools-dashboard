@@ -77,18 +77,18 @@ export default function ToolsTable({
                   <TR key={tool.id}>
                      <TD>
                         <div className="flex items-center gap-3">
-                           <div className="relative h-8 w-8 overflow-hidden rounded-xl bg-elevated">
-                              {tool.icon_url ? (
-                                 <img
-                                    src={tool.icon_url}
-                                    alt=""
-                                    className="h-full w-full object-contain p-1"
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer"
-                                 />
-                              ) : (
-                                 <div className="h-full w-full rounded-xl bg-elevated" />
-                              )}
+                           <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-xl bg-elevated flex items-center justify-center">
+                              <img
+                                 src={tool.icon_url}
+                                 alt=""
+                                 className="h-full w-full object-contain p-1"
+                                 loading="lazy"
+                                 onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                    e.currentTarget.parentElement?.classList.add("text-xs", "font-semibold", "text-muted");
+                                    e.currentTarget.parentElement!.textContent = tool.name.charAt(0);
+                                 }}
+                              />
                            </div>
                            <div className="min-w-0">
                               <div className="font-medium">{tool.name}</div>
