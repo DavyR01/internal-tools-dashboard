@@ -4,8 +4,17 @@ import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
 import ToolsTable from "./ToolsTable";
-import { useDepartments, useToolsList, ToolStatus, ToolsSortBy, SortOrder } from "../queries";
+import {
+   useDepartments,
+   useToolsList,
+   Tool,
+   ToolStatus,
+   ToolsSortBy,
+   SortOrder,
+   useUpdateTool,
+} from "../queries";
 
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
@@ -16,6 +25,18 @@ function useDebouncedValue<T>(value: T, delay = 300) {
    }, [value, delay]);
 
    return debounced;
+}
+
+type ToolModalState =
+   | { mode: "view"; tool: Tool }
+   | { mode: "edit"; tool: Tool }
+   | null;
+
+function formatDate(value: string | undefined) {
+   if (!value) return "—";
+   const d = new Date(value);
+   if (Number.isNaN(d.getTime())) return "—";
+   return d.toLocaleDateString();
 }
 
 export default function ToolsCatalog() {
@@ -47,6 +68,51 @@ export default function ToolsCatalog() {
 
    function resetPage() {
       setPage(1);
+   }
+
+   // ---- Modal state (view/edit) ----
+   const [modal, setModal] = useState<ToolModalState>(null);
+   const closeModal = () => setModal(null);
+
+   // ---- Edit form state (minimal) ----
+   const updateTool = useUpdateTool();
+   const [editMonthlyCost, setEditMonthlyCost] = useState<number | "">("");
+   const [editStatus, setEditStatus] = useState<ToolStatus>("active");
+   const [editName, setEditName] = useState("");
+
+   function openView(tool: Tool) {
+      setModal({ mode: "view", tool });
+   }
+
+   function openEdit(tool: Tool) {
+      setEditMonthlyCost(
+         typeof tool.monthly_cost === "number"
+            ? tool.monthly_cost
+            : tool.monthly_cost != null
+               ? Number(tool.monthly_cost)
+               : ""
+      );
+      setEditStatus(tool.status);
+      setEditName(tool.name ?? "");
+      setModal({ mode: "edit", tool });
+   }
+
+   function onSaveEdit() {
+      if (!modal || modal.mode !== "edit") return;
+
+      const patch: Partial<Pick<Tool, "monthly_cost" | "status" | "name">> = {
+         status: editStatus,
+      };
+
+      if (editMonthlyCost !== "") patch.monthly_cost = editMonthlyCost;
+      if (editName.trim()) patch.name = editName.trim();
+
+      updateTool.mutate(
+         { id: modal.tool.id, patch },
+         {
+            onSuccess: () => closeModal(),
+         }
+      );
    }
 
    return (
@@ -148,6 +214,8 @@ export default function ToolsCatalog() {
                isLoading={tools.isLoading}
                isError={!!tools.error}
                onRetry={() => tools.refetch()}
+               onView={openView}
+               onEdit={openEdit}
             />
 
             {/* Footer */}
@@ -185,6 +253,137 @@ export default function ToolsCatalog() {
                   </Button>
                </div>
             </div>
+
+            {/* ---- Modals ---- */}
+            {modal?.mode === "view" ? (
+               <Modal open onClose={closeModal} title="Tool details">
+                  <div className="space-y-4 text-sm">
+                     <div>
+                        <div className="text-xs text-muted">Name</div>
+                        <div className="font-medium">{modal.tool.name}</div>
+                     </div>
+
+                     <div className="grid grid-cols-2 gap-3">
+                        <div>
+                           <div className="text-xs text-muted">Category</div>
+                           <div>{modal.tool.category ?? "—"}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Vendor</div>
+                           <div>{modal.tool.vendor ?? "—"}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Department</div>
+                           <div>{modal.tool.owner_department ?? "—"}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Status</div>
+                           <div>{modal.tool.status}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Users</div>
+                           <div>{modal.tool.active_users_count ?? "—"}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Monthly cost</div>
+                           <div>
+                              {typeof modal.tool.monthly_cost === "number"
+                                 ? `${modal.tool.monthly_cost} €`
+                                 : "—"}
+                           </div>
+                        </div>
+                     </div>
+
+                     <div>
+                        <div className="text-xs text-muted">Description</div>
+                        <div className="text-muted">{modal.tool.description ?? "—"}</div>
+                     </div>
+
+                     <div className="grid grid-cols-2 gap-3">
+                        <div>
+                           <div className="text-xs text-muted">Created</div>
+                           <div>{formatDate(modal.tool.created_at)}</div>
+                        </div>
+                        <div>
+                           <div className="text-xs text-muted">Last update</div>
+                           <div>{formatDate(modal.tool.updated_at)}</div>
+                        </div>
+                     </div>
+
+                     {modal.tool.website_url ? (
+                        <div>
+                           <div className="text-xs text-muted">Website</div>
+                           <a
+                              href={modal.tool.website_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-sm underline underline-offset-4"
+                           >
+                              {modal.tool.website_url}
+                           </a>
+                        </div>
+                     ) : null}
+
+                     <div className="flex justify-end gap-2 pt-2">
+                        <Button variant="secondary" onClick={closeModal}>
+                           Close
+                        </Button>
+                     </div>
+                  </div>
+               </Modal>
+            ) : null}
+
+            {modal?.mode === "edit" ? (
+               <Modal open onClose={closeModal} title="Edit tool">
+                  <div className="space-y-4">
+                     <div className="space-y-1">
+                        <div className="text-xs text-muted">Name</div>
+                        <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                     </div>
+
+                     <div className="space-y-1">
+                        <div className="text-xs text-muted">Monthly cost (€)</div>
+                        <input
+                           className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                           type="number"
+                           value={editMonthlyCost}
+                           onChange={(e) =>
+                              setEditMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
+                           }
+                        />
+                     </div>
+
+                     <div className="space-y-1">
+                        <div className="text-xs text-muted">Status</div>
+                        <select
+                           className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                           value={editStatus}
+                           onChange={(e) => setEditStatus(e.target.value as ToolStatus)}
+                        >
+                           <option value="active">Active</option>
+                           <option value="expiring">Expiring</option>
+                           <option value="unused">Unused</option>
+                        </select>
+                     </div>
+
+                     {updateTool.isError ? (
+                        <div className="rounded-xl border border-border/30 bg-elevated/50 p-3 text-sm">
+                           <div className="font-medium">Couldn’t save changes</div>
+                           <div className="text-muted">Please retry.</div>
+                        </div>
+                     ) : null}
+
+                     <div className="flex justify-end gap-2 pt-2">
+                        <Button variant="secondary" onClick={closeModal} disabled={updateTool.isPending}>
+                           Cancel
+                        </Button>
+                        <Button onClick={onSaveEdit} disabled={updateTool.isPending}>
+                           {updateTool.isPending ? "Saving…" : "Save"}
+                        </Button>
+                     </div>
+                  </div>
+               </Modal>
+            ) : null}
          </CardContent>
       </Card>
    );

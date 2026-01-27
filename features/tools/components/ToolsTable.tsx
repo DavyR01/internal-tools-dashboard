@@ -31,11 +31,15 @@ export default function ToolsTable({
    isLoading,
    isError,
    onRetry,
+   onView,
+   onEdit
 }: {
    tools: Tool[];
    isLoading: boolean;
    isError: boolean;
    onRetry: () => void;
+   onView: (t: Tool) => void;
+   onEdit: (t: Tool) => void;
 }) {
 
    const toggleStatus = useToggleToolStatus();
@@ -176,10 +180,10 @@ export default function ToolsTable({
                                        {tool.status === "active" ? "Disable" : "Enable"}
                                     </Button>
 
-                                    <Button variant="secondary" className="h-8 px-3 text-xs">
+                                    <Button variant="secondary" className="h-8 px-3 text-xs" onClick={() => onView(tool)}>
                                        View
                                     </Button>
-                                    <Button variant="secondary" className="h-8 px-3 text-xs">
+                                    <Button variant="secondary" className="h-8 px-3 text-xs" onClick={() => onEdit(tool)}>
                                        Edit
                                     </Button>
                                  </div>

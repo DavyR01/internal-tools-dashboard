@@ -119,3 +119,21 @@ export function useToggleToolStatus() {
       },
    });
 }
+
+
+
+
+export function useUpdateTool() {
+   const qc = useQueryClient();
+
+   return useMutation({
+      mutationFn: async (input: { id: number; patch: Partial<Pick<Tool, "name" | "monthly_cost" | "status">> }) => {
+         const { id, patch } = input;
+         const { data } = await api.patch<Tool>(`/tools/${id}`, patch);
+         return data;
+      },
+      onSuccess: () => {
+         qc.invalidateQueries({ queryKey: ["tools"] });
+      },
+   });
+}
