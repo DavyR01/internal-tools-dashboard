@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/axios";
 import { queryKeys } from "@/lib/query/keys";
 
@@ -96,6 +96,26 @@ export function useDepartments() {
       queryFn: async () => {
          const { data } = await api.get<Department[]>("/departments");
          return data;
+      },
+   });
+}
+
+
+
+export function useToggleToolStatus() {
+   const qc = useQueryClient();
+
+   return useMutation({
+      mutationFn: async (input: { id: number; nextStatus: ToolStatus }) => {
+         const { id, nextStatus } = input;
+
+         // JSON Server: PATCH partiel
+         const { data } = await api.patch<Tool>(`/tools/${id}`, { status: nextStatus });
+         return data;
+      },
+      onSuccess: () => {
+         // Rafraîchir toutes les listes tools (toutes pages/filters)
+         qc.invalidateQueries({ queryKey: ["tools"] });
       },
    });
 }
