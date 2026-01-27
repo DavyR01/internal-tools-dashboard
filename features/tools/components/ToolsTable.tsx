@@ -1,0 +1,127 @@
+'use client';
+
+import Image from "next/image";
+import { StatusBadge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Table, THead, TH, TR, TD } from "@/components/ui/Table";
+import type { Tool } from "../queries";
+
+export default function ToolsTable({
+   tools,
+   isLoading,
+   isError,
+   onRetry,
+}: {
+   tools: Tool[];
+   isLoading: boolean;
+   isError: boolean;
+   onRetry: () => void;
+}) {
+   if (isError) {
+      return (
+         <div className="rounded-2xl border border-border bg-surface p-6">
+            <div className="text-sm font-medium">Couldn’t load tools</div>
+            <div className="mt-1 text-sm text-muted">Please retry.</div>
+            <div className="mt-4">
+               <Button variant="secondary" onClick={onRetry}>
+                  Retry
+               </Button>
+            </div>
+         </div>
+      );
+   }
+
+
+   function formatCurrencyEUR(value: unknown) {
+      const n = typeof value === "number" ? value : Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return new Intl.NumberFormat("fr-FR", {
+         style: "currency",
+         currency: "EUR",
+         maximumFractionDigits: 0,
+      }).format(n);
+   }
+
+   return (
+      <Table>
+         <THead>
+            <TR className="border-t-0">
+               <TH>Tool</TH>
+               <TH>Category</TH>
+               <TH>Department</TH>
+               <TH className="text-right">Users</TH>
+               <TH className="text-right">Monthly cost</TH>
+               <TH>Last update</TH>
+               <TH>Status</TH>
+               <TH className="text-right">Actions</TH>
+            </TR>
+         </THead>
+
+         <tbody>
+            {isLoading ? (
+               Array.from({ length: 8 }).map((_, i) => (
+                  <TR key={i}>
+                     <TD colSpan={8} className="py-4">
+                        <div className="h-4 w-full animate-pulse rounded-lg bg-elevated/70" />
+                     </TD>
+                  </TR>
+               ))
+            ) : tools.length === 0 ? (
+               <TR>
+                  <TD colSpan={8} className="py-10 text-center text-sm text-muted">
+                     No tools found.
+                  </TD>
+               </TR>
+            ) : (
+               tools.map((tool) => (
+                  <TR key={tool.id}>
+                     <TD>
+                        <div className="flex items-center gap-3">
+                           <div className="relative h-8 w-8 overflow-hidden rounded-xl bg-elevated">
+                              {tool.icon_url ? (
+                                 <img
+                                    src={tool.icon_url}
+                                    alt=""
+                                    className="h-full w-full object-contain p-1"
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                 />
+                              ) : (
+                                 <div className="h-full w-full rounded-xl bg-elevated" />
+                              )}
+                           </div>
+                           <div className="min-w-0">
+                              <div className="font-medium">{tool.name}</div>
+                              <div className="truncate text-xs text-muted">{tool.description}</div>
+                           </div>
+                        </div>
+                     </TD>
+                     <TD className="text-muted">{tool.category}</TD>
+                     <TD className="text-muted">{tool.owner_department}</TD>
+                     <TD className="text-right">{tool.active_users_count}</TD>
+                     <TD className="text-right">
+                        {formatCurrencyEUR(tool.monthly_cost)}
+                     </TD>
+                     <TD className="text-muted">
+                        {new Date(tool.updated_at).toLocaleDateString()}
+                     </TD>
+                     <TD>
+                        <StatusBadge status={tool.status} />
+                     </TD>
+                     <TD className="text-right">
+                        <div className="inline-flex items-center gap-2">
+                           <Button variant="secondary">
+                              View
+                           </Button>
+                           <Button variant="secondary">
+                              Edit
+                           </Button>
+                        </div>
+                     </TD>
+                  </TR>
+               ))
+            )}
+         </tbody>
+      </Table>
+   );
+}
