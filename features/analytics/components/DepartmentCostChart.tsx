@@ -1,18 +1,12 @@
 "use client";
 
-import {
-   PieChart,
-   Pie,
-   Tooltip,
-   ResponsiveContainer,
-   Cell,
-} from "recharts";
+import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useToolsForDepartmentCostBreakdown } from "../queries";
-import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
-import { ErrorState } from "@/components/ui/ErrorState";
-
+import ChartTooltip, {
+   RechartsTooltipContentProps,
+} from "@/components/ui/ChartToolTip";
+import { AnalyticsWidget } from "@/components/ui/AnalyticsWidget";
 
 type Tool = {
    id: number;
@@ -35,46 +29,12 @@ function buildDepartmentCostData(tools: Tool[]) {
 }
 
 export default function DepartmentCostChart() {
-   const { data, isLoading, isError, refetch } = useToolsForDepartmentCostBreakdown();
+   const { data, isLoading, isError, refetch } =
+      useToolsForDepartmentCostBreakdown();
 
-   if (isLoading) {
-      return (
-         <Card>
-            <CardHeader>
-               <h3 className="text-sm font-medium">Cost by department</h3>
-               <p className="mt-1 text-xs text-muted">
-                  Share of total monthly spend by department.
-               </p>
-            </CardHeader>
-            <CardContent>
-               <div className="h-64 rounded bg-muted/40" />
-            </CardContent>
-         </Card>
-      );
-   }
-
-   if (isError || !data) {
-      return (
-         <Card>
-            <CardHeader>
-               <h3 className="text-sm font-medium">Cost by department</h3>
-               <p className="mt-1 text-xs text-muted">
-                  Share of total monthly spend by department.
-               </p>
-            </CardHeader>
-            <CardContent>
-               <ErrorState
-                  title="Unable to load department breakdown"
-                  description="Please check your connection and try again."
-                  onRetry={refetch}
-               />
-            </CardContent>
-         </Card>
-      );
-   }
-
-   const tools = data as Tool[];
+   const tools = (data ?? []) as Tool[];
    const chartData = buildDepartmentCostData(tools);
+
    const opacities = [0.95, 0.75, 0.55, 0.4, 0.28, 0.2];
 
    const euro = new Intl.NumberFormat("fr-FR", {
@@ -84,51 +44,54 @@ export default function DepartmentCostChart() {
    });
 
    return (
-      <Card>
-         <CardHeader>
-            <h3 className="text-sm font-medium">Cost by department</h3>
-            <p className="mt-1 text-xs text-muted">
-               Share of total monthly spend by department.
-            </p>
-         </CardHeader>
+      <AnalyticsWidget
+         title="Cost by department"
+         description="Share of total monthly spend by department."
+         isLoading={isLoading}
+         isError={isError}
+         onRetry={refetch}
+         isEmpty={!isLoading && !isError && chartData.length === 0}
+         emptyTitle="No department data"
+         emptyDescription="No department cost data is available."
+      >
+         <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+               <PieChart>
+                  <Pie
+                     data={chartData}
+                     dataKey="value"
+                     nameKey="name"
+                     innerRadius="62%"
+                     outerRadius="86%"
+                     paddingAngle={2}
+                  >
+                     {chartData.map((_, i) => (
+                        <Cell
+                           key={i}
+                           fill="rgb(var(--ring))"
+                           fillOpacity={opacities[i % opacities.length]}
+                           stroke="rgb(var(--surface))"
+                           strokeWidth={2}
+                        />
+                     ))}
+                  </Pie>
 
-         <CardContent>
-            <div className="h-64">
-               <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                     <Pie
-                        data={chartData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius="62%"
-                        outerRadius="86%"
-                        paddingAngle={2}
-                     >
-                        {chartData.map((_, i) => (
-                           <Cell
-                              key={i}
-                              fill="rgb(var(--ring))"
-                              fillOpacity={opacities[i % opacities.length]}
-                              stroke="rgb(var(--surface))"
-                              strokeWidth={2}
-                           />
-                        ))}
-                     </Pie>
-                     <Tooltip
-                        content={(props) => (
-                           <ChartTooltip
-                              {...(props as unknown as RechartsTooltipContentProps)}
-                              euro={euro}
-                              valueLabel="Monthly spend"
-                              getTitle={({ payloadItem }) => (payloadItem?.name as string) ?? "Department"}
-                           />
-                        )}
-                        cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
-                     />
-                  </PieChart>
-               </ResponsiveContainer>
-            </div>
-         </CardContent>
-      </Card>
+                  <Tooltip
+                     content={(props) => (
+                        <ChartTooltip
+                           {...(props as unknown as RechartsTooltipContentProps)}
+                           euro={euro}
+                           valueLabel="Monthly spend"
+                           getTitle={({ payloadItem }) =>
+                              (payloadItem?.name as string) ?? "Department"
+                           }
+                        />
+                     )}
+                     cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
+                  />
+               </PieChart>
+            </ResponsiveContainer>
+         </div>
+      </AnalyticsWidget>
    );
 }
