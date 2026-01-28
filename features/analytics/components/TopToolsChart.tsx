@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useTopToolsByCost } from "../queries";
 import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 type Tool = {
    id: number;
@@ -38,8 +39,7 @@ function truncateLabel(label: string, max = 14) {
 }
 
 export default function TopToolsChart() {
-   const { data, isLoading, isError } = useTopToolsByCost();
-
+   const { data, isLoading, isError, refetch } = useTopToolsByCost();
    const [isMobile, setIsMobile] = useState(false);
 
    useEffect(() => {
@@ -83,8 +83,18 @@ export default function TopToolsChart() {
       return (
          <Card>
             <CardHeader>
-               <p className="text-sm text-muted">Unable to load top expensive tools.</p>
+               <h3 className="text-sm font-medium">Top expensive tools</h3>
+               <p className="mt-1 text-xs text-muted">
+                  Highest monthly costs across the tools catalog.
+               </p>
             </CardHeader>
+            <CardContent>
+               <ErrorState
+                  title="Unable to load top expensive tools"
+                  description="Please check your connection and try again."
+                  onRetry={refetch}
+               />
+            </CardContent>
          </Card>
       );
    }
