@@ -141,9 +141,7 @@ export default function KpiCards() {
                      <Icon className="h-5 w-5" />
                   </IconBadge>
                </div>
-
-               <div className="mt-6 text-3xl font-semibold tracking-tight">{value}</div>
-
+               <div className="mt-6 text-[25px] font-bold tracking-tight">{value}</div>
                <div className="mt-4">
                   <TrendPill value={trend} tone={tone} />
                </div>

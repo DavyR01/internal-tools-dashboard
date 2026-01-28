@@ -51,12 +51,23 @@ export default function Header() {
       };
       document.addEventListener("keydown", onKeyDown);
 
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
+      const body = document.body;
+
+      const prevOverflow = body.style.overflow;
+      const prevPaddingRight = body.style.paddingRight;
+
+      const scrollbarWidth =
+         window.innerWidth - document.documentElement.clientWidth;
+
+      body.style.overflow = "hidden";
+      if (scrollbarWidth > 0) {
+         body.style.paddingRight = `${scrollbarWidth}px`;
+      }
 
       return () => {
          document.removeEventListener("keydown", onKeyDown);
-         document.body.style.overflow = prevOverflow;
+         body.style.overflow = prevOverflow;
+         body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
 
