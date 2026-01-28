@@ -32,21 +32,8 @@ export default function Header() {
    }, [pathname]);
 
    useEffect(() => {
-      if (!mobileOpen) return;
-
-      const onKeyDown = (e: KeyboardEvent) => {
-         if (e.key === "Escape") setMobileOpen(false);
-      };
-      document.addEventListener("keydown", onKeyDown);
-
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-
-      return () => {
-         document.removeEventListener("keydown", onKeyDown);
-         document.body.style.overflow = prevOverflow;
-      };
-   }, [mobileOpen]);
+      setSearchOpen(false);
+   }, [pathname]);
 
    useEffect(() => {
       if (!mobileOpen && !searchOpen) return;
@@ -68,9 +55,6 @@ export default function Header() {
       };
    }, [mobileOpen, searchOpen]);
 
-   useEffect(() => {
-      setSearchOpen(false);
-   }, [pathname]);
 
 
 
