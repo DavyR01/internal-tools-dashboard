@@ -157,6 +157,8 @@ export default function Header() {
                <input
                   className="h-10 w-full rounded-xl border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                   placeholder="Search Tools..."
+                  id="header-search"
+                  aria-label="Search tools"
                />
             </div>
 
@@ -251,6 +253,8 @@ export default function Header() {
                      <div className="relative mt-4">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
                         <input
+                           id="drawer-search"
+                           aria-label="Search tools"
                            className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                            placeholder="Search Tools..."
                         />
@@ -329,6 +333,8 @@ export default function Header() {
                      <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
                         <input
+                           id="modal-search"
+                           aria-label="Search tools"
                            autoFocus
                            className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                            placeholder="Search Tools..."
