@@ -25,6 +25,9 @@ const config: Config = {
          ringColor: {
             DEFAULT: "rgb(var(--ring) / <alpha-value>)",
          },
+         screens: {
+            xs: "480px",
+         },
       },
    },
    plugins: [],

@@ -27,7 +27,7 @@ export default function Header() {
 
    return (
       <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
-         <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4">
+         <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-2 px-3 md:gap-3 md:px-4">
             {/* Mobile */}
             <button
                type="button"
@@ -40,8 +40,8 @@ export default function Header() {
             {/* Brand */}
             <Link href="/" className="flex items-center gap-2">
                <div className="h-8 w-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500" />
-               <div className="leading-tight">
-                  <div className="text-sm font-semibold">TechCorp</div>
+               <div className="hidden leading-tight xs:block">
+                  <div className="text-md font-semibold">TechCorp</div>
                </div>
             </Link>
 
@@ -56,7 +56,7 @@ export default function Header() {
                         className={cx(
                            "rounded-lg px-3 py-2 text-sm transition",
                            active
-                              ? "bg-black/10 font-medium dark:bg-white/10"
+                              ? "font-semibold"
                               : "opacity-80 hover:bg-black/5 hover:opacity-100 dark:hover:bg-white/5"
                         )}
                      >
