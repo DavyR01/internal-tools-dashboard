@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, Search, Sun, Moon, X, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
-
+import { createPortal } from "react-dom";
 
 const navItems = [
    { label: "Dashboard", href: "/" },
@@ -15,6 +15,11 @@ const navItems = [
 
 function cx(...classes: Array<string | false | undefined>) {
    return classes.filter(Boolean).join(" ");
+}
+
+function Portal({ children }: { children: React.ReactNode }) {
+   if (typeof window === "undefined") return null;
+   return createPortal(children, document.body);
 }
 
 export default function Header() {
@@ -54,10 +59,6 @@ export default function Header() {
          document.body.style.overflow = prevOverflow;
       };
    }, [mobileOpen, searchOpen]);
-
-
-
-
 
 
    return (
@@ -150,7 +151,6 @@ export default function Header() {
             </button>
 
 
-
             {/* Notifications */}
             <button
                type="button"
@@ -163,7 +163,7 @@ export default function Header() {
                </span>
             </button>
 
-            {/* Settings */}
+
             {/* Settings */}
             <button
                type="button"
@@ -175,7 +175,6 @@ export default function Header() {
             </button>
 
 
-
             {/* Avatar */}
             <button
                type="button"
@@ -185,7 +184,6 @@ export default function Header() {
                A
             </button>
          </div>
-
 
 
          {/* Mobile nav (drawer) */}
@@ -245,7 +243,6 @@ export default function Header() {
                               </div>
                            );
                         }
-
                         return (
                            <Link
                               key={item.href}
@@ -267,50 +264,49 @@ export default function Header() {
             </div>
          )}
 
-
          {searchOpen && (
-            <div className="lg:hidden">
-               {/* Backdrop */}
-               <button
-                  type="button"
-                  className="fixed inset-0 z-40 bg-black/30"
-                  aria-label="Close search"
-                  onClick={() => setSearchOpen(false)}
-               />
+            <Portal>
+               <div className="lg:hidden">
+                  {/* Backdrop */}
+                  <button
+                     type="button"
+                     className="fixed inset-0 z-100 bg-black/50"
+                     aria-label="Close search"
+                     onClick={() => setSearchOpen(false)}
+                  />
 
-               {/* Modal */}
-               <div
-                  id="search-modal"
-                  role="dialog"
-                  aria-modal="true"
-                  className="fixed left-1/2 top-24 z-50 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
-               >
-                  <div className="flex items-center gap-2">
-                     <div className="text-sm font-semibold">Search</div>
-                     <div className="flex-1" />
-                     <button
-                        type="button"
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
-                        aria-label="Close search"
-                        onClick={() => setSearchOpen(false)}
-                     >
-                        <X className="h-5 w-5" />
-                     </button>
-                  </div>
+                  {/* Modal */}
+                  <div
+                     id="search-modal"
+                     role="dialog"
+                     aria-modal="true"
+                     className="fixed left-1/2 top-24 z-110 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
+                  >
+                     <div className="flex items-center gap-2">
+                        <div className="text-sm font-semibold">Search</div>
+                        <div className="flex-1" />
+                        <button
+                           type="button"
+                           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
+                           aria-label="Close search"
+                           onClick={() => setSearchOpen(false)}
+                        >
+                           <X className="h-5 w-5" />
+                        </button>
+                     </div>
 
-                  <div className="relative mt-3">
-                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
-                     <input
-                        autoFocus
-                        className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
-                        placeholder="Search Tools..."
-                     />
+                     <div className="relative mt-3">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
+                        <input
+                           autoFocus
+                           className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
+                           placeholder="Search Tools..."
+                        />
+                     </div>
                   </div>
                </div>
-            </div>
+            </Portal>
          )}
-
-
       </header>
    );
 }
