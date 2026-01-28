@@ -36,6 +36,42 @@ function truncateLabel(label: string, max = 14) {
    return label.length > max ? `${label.slice(0, max)}…` : label;
 }
 
+
+type RechartsTooltipContentProps = {
+   active?: boolean;
+   label?: string;
+   payload?: ReadonlyArray<{
+      value?: number | string;
+      name?: string;
+      payload?: { name?: string };
+   }>;
+};
+
+function TopToolsTooltip({
+   active,
+   payload,
+   euro,
+}: RechartsTooltipContentProps & { euro: Intl.NumberFormat }) {
+   if (!active || !payload?.length) return null;
+
+   const row = payload[0];
+   const toolName =
+      row?.payload?.name || row?.name || "Tool";
+
+   const raw = row?.value;
+   const value = typeof raw === "number" ? raw : Number(raw ?? 0);
+
+   return (
+      <div className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text shadow-sm">
+         <div className="font-medium">{toolName}</div>
+         <div className="mt-1 text-xs text-muted">
+            Monthly cost: <span className="text-text">{euro.format(value)}</span>
+         </div>
+      </div>
+   );
+}
+
+
 export default function TopToolsChart() {
    const { data, isLoading, isError } = useTopToolsByCost();
 
@@ -136,7 +172,15 @@ export default function TopToolsChart() {
                            tickFormatter={(v) => euro.format(Number(v))}
                            width={72}
                         />
-                        <Tooltip formatter={(v) => [euro.format(Number(v)), "Monthly cost"]} />
+                        <Tooltip
+                           content={(props) => (
+                              <TopToolsTooltip
+                                 {...(props as unknown as RechartsTooltipContentProps)}
+                                 euro={euro}
+                              />
+                           )}
+                           cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
+                        />
                         <Bar
                            dataKey="monthly_cost"
                            fill="rgb(var(--ring))"
@@ -166,7 +210,15 @@ export default function TopToolsChart() {
                            width={130}
                            tickFormatter={(v) => truncateLabel(String(v), 14)}
                         />
-                        <Tooltip formatter={(v) => [euro.format(Number(v)), "Monthly cost"]} />
+                        <Tooltip
+                           content={(props) => (
+                              <TopToolsTooltip
+                                 {...(props as unknown as RechartsTooltipContentProps)}
+                                 euro={euro}
+                              />
+                           )}
+                           cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
+                        />
                         <Bar
                            dataKey="monthly_cost"
                            fill="rgb(var(--ring))"
