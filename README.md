@@ -43,10 +43,15 @@ Elle repose sur une séparation claire des responsabilités :
 
 Structure principale :
 
-```
+```text
 app/                # Routes (Dashboard, Tools, Analytics)
 components/         # Design system et layout partagé
+├─ ui/              # Composants UI réutilisables (Card, Button, ChartTooltip…)
+└─ layout/          # Header et layout global
 features/           # Logique par domaine (dashboard, tools, analytics)
+├─ dashboard/       # KPIs et tables du dashboard (J6)
+├─ tools/           # Gestion des outils SaaS (J7)
+└─ analytics/       # KPIs et data visualisation (J8)
 lib/                # API, React Query, utilitaires
 store/              # UI state global (Zustand)
 styles/             # Styles globaux et tokens
@@ -159,6 +164,27 @@ La data visualisation (Jour 8) repose sur :
 * **Recharts** comme librairie de graphiques,
 * une intégration stricte au design system existant,
 * des visualisations orientées lisibilité et prise de décision.
+
+### Analytics (J8)
+
+La page **Analytics** apporte une vision orientée pilotage et optimisation des coûts.
+
+Elle comprend :
+
+* **KPIs Analytics** fournissant une vue synthétique des coûts et usages,
+* **Monthly spend evolution** (LineChart) avec une échelle dynamique adaptée aux données réelles,
+* **Cost by department** (Donut chart) basé sur l’agrégation des coûts mensuels par département,
+* **Top expensive tools** (Bar chart) permettant d’identifier les principaux leviers d’optimisation.
+
+Choix clés :
+
+* classement **relatif** des outils par coût (aucun seuil arbitraire),
+* échelles dynamiques afin de garantir la lisibilité même avec des variations faibles,
+* tooltips thémés et cohérents entre light et dark mode,
+* responsive intelligent avec adaptation de l’orientation des graphiques selon le viewport,
+* aucune donnée artificielle ou logique métier inventée côté frontend.
+
+Ces choix garantissent une visualisation fiable, lisible et défendable dans un contexte d’outil interne professionnel.
 
 ---
 
