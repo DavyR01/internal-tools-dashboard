@@ -2,6 +2,7 @@ import PageShell from "@/components/layout/PageShell";
 import AnalyticsKpis from "@/features/analytics/components/AnalyticsKpis";
 import CostEvolutionChart from "@/features/analytics/components/CostEvolutionChart";
 import DepartmentCostChart from "@/features/analytics/components/DepartmentCostChart";
+import ExportReportButton from "@/features/analytics/components/ExportReportButton";
 import TopToolsChart from "@/features/analytics/components/TopToolsChart";
 
 export default function AnalyticsPage() {
@@ -14,6 +15,8 @@ export default function AnalyticsPage() {
                   Track spend, usage and optimization opportunities across departments.
                </p>
             </div>
+            <ExportReportButton />
+
             <AnalyticsKpis />
 
             {/* COST ANALYTICS */}
@@ -37,6 +40,7 @@ export default function AnalyticsPage() {
                   {/* <InsightsPanel /> */}
                </div>
             </div>
+
          </div>
       </PageShell>
    );
