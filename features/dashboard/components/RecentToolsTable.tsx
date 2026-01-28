@@ -4,13 +4,26 @@ import { Table, THead, TH, TR, TD } from "@/components/ui/Table";
 import { StatusBadge } from "@/components/ui/Badge";
 import { useRecentTools } from "../queries";
 import { Calendar } from "lucide-react";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 export default function RecentToolsTable() {
-   const { data, isLoading } = useRecentTools();
+   const { data, isLoading, isError, error, refetch } = useRecentTools();
 
    if (isLoading) {
       return <div className="h-48 animate-pulse rounded-2xl bg-surface" />;
    }
+
+   if (isError) {
+      return (
+         <ErrorState
+            title="Unable to load recent tools"
+            description="Please check your connection and try again."
+            onRetry={refetch}
+            className="h-48"
+         />
+      );
+   }
+
 
    return (
       <div className="rounded-2xl border border-border bg-surface shadow-sm overflow-x-auto">
