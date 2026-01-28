@@ -206,7 +206,7 @@ export default function ToolsCatalog() {
             <ToolsTable
                tools={tools.data?.items ?? []}
                isLoading={tools.isLoading}
-               isError={!!tools.error}
+               isError={tools.isError}
                onRetry={() => tools.refetch()}
                onView={openView}
                onEdit={openEdit}
