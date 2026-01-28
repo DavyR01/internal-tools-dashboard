@@ -10,5 +10,6 @@ export const queryKeys = {
    analytics: {
       all: ["analytics"] as const,
       overview: ["analytics", "overview"] as const,
+      topTools: (limit: number) => ["analytics", "top-tools", limit],
    },
 };
