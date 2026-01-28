@@ -33,13 +33,6 @@ type ToolModalState =
    | { mode: "edit"; tool: Tool }
    | null;
 
-function formatDate(value: string | undefined) {
-   if (!value) return "—";
-   const d = new Date(value);
-   if (Number.isNaN(d.getTime())) return "—";
-   return d.toLocaleDateString();
-}
-
 export default function ToolsCatalog() {
    const [page, setPage] = useState(1);
    const limit = 10;

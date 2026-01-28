@@ -12,29 +12,31 @@ export default function RecentToolsTable() {
    }
 
    return (
-      <Table className="bg-surface">
-         <THead className="bg-surface">
-            <tr>
-               <TH>Tool</TH>
-               <TH>Department</TH>
-               <TH>Users</TH>
-               <TH className="text-right">Monthly Cost</TH>
-               <TH>Status</TH>
-            </tr>
-         </THead>
-         <tbody>
-            {data.map((tool: any) => (
-               <TR key={tool.id}>
-                  <TD className="font-medium">{tool.name}</TD>
-                  <TD>{tool.owner_department}</TD>
-                  <TD>{tool.active_users_count}</TD>
-                  <TD className="text-right">€{tool.monthly_cost}</TD>
-                  <TD>
-                     <StatusBadge status={tool.status} />
-                  </TD>
-               </TR>
-            ))}
-         </tbody>
-      </Table>
+      <div className="overflow-hidden rounded-2xl border-[1.2px] border-border bg-surface shadow-sm ring-">
+         <Table className="bg-surface">
+            <THead className="bg-surface">
+               <tr>
+                  <TH>Tool</TH>
+                  <TH>Department</TH>
+                  <TH>Users</TH>
+                  <TH className="text-right">Monthly Cost</TH>
+                  <TH>Status</TH>
+               </tr>
+            </THead>
+            <tbody>
+               {data.map((tool: any) => (
+                  <TR key={tool.id}>
+                     <TD className="font-medium">{tool.name}</TD>
+                     <TD>{tool.owner_department}</TD>
+                     <TD>{tool.active_users_count}</TD>
+                     <TD className="text-right">€{tool.monthly_cost}</TD>
+                     <TD>
+                        <StatusBadge status={tool.status} />
+                     </TD>
+                  </TR>
+               ))}
+            </tbody>
+         </Table>
+      </div>
    );
 }

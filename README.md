@@ -4,6 +4,11 @@
 
 Ce projet est une application frontend développée avec Next.js permettant de monitorer et gérer les outils SaaS internes d’une entreprise.
 
+Il s’agit d’un **dashboard interne** destiné à un Admin IT, permettant de :
+- monitorer les outils SaaS utilisés au sein de l’organisation,
+- suivre les coûts et l’usage,
+- gérer le cycle de vie des outils internes.
+
 ### Installation
 
 ```bash
@@ -11,17 +16,25 @@ npm install
 npm run dev
 ```
 
+L’application est accessible sur :
+
+```
+http://localhost:3000
+```
+
+
 ### Accès
 
-* `/` : Dashboard
-* `/tools` : Tools (Jour 7)
-* `/analytics` : Analytics (Jour 8)
+* `/` : Dashboard (J6)
+* `/tools` : Tools catalog & management (J7)
+* `/analytics` : Analytics & charts (J8)
 
 ---
 
 ## 🏗️ Architecture
 
-L’architecture repose sur une séparation claire des responsabilités :
+L’architecture a été pensée pour être **simple, lisible et maintenable**, en respectant les bonnes pratiques attendues pour un outil interne professionnel.
+Elle repose sur une séparation claire des responsabilités :
 
 * **routing** géré par Next.js (App Router),
 * **composants UI réutilisables**,
@@ -57,36 +70,38 @@ Les composants principaux incluent :
 * Header et layout communs,
 * status system cohérent (Active / Expiring / Unused).
 
+Les versions light et dark partagent **exactement la même structure et hiérarchie UI**, seules les valeurs de thème diffèrent.
+
 ---
 
 ## 🔗 Navigation & User Journey
 
-Le parcours utilisateur est pensé comme un flux logique :
+Le parcours utilisateur suit un flux logique et progressif :
 
 **Dashboard → Tools → Analytics**
 
-* Le Dashboard fournit une vue globale (KPIs, outils récents),
-* La page Tools permet la gestion détaillée des outils SaaS,
-* La page Analytics apporte des insights coûts et usage.
+- Le **Dashboard** fournit une vue globale (KPIs, outils récents),
+- La page **Tools** permet la gestion opérationnelle détaillée des outils SaaS,
+- La page **Analytics** apporte des insights orientés coûts et usage.
 
-La navigation est assurée par un header unique partagé sur les trois pages.
+La navigation est assurée par un **header global unique partagé** entre toutes les pages.
 
 ---
 
 ## 📊 Data Integration Strategy
 
-Toutes les données proviennent d’un backend **JSON Server**.
+Toutes les données proviennent d’un backend simulé via **JSON Server**.
 
 Stratégie :
 
-* **Axios** comme client HTTP,
-* **TanStack Query** pour la gestion du server state,
-* cache, refetch et loading states gérés automatiquement.
+- **Axios** comme client HTTP,
+- **TanStack Query** pour la gestion du server state,
+- pagination, filtres, tri et mutations gérés côté serveur.
 
 Cette approche garantit :
-
-* une séparation claire entre UI state et données serveur,
-* une base scalable pour filtres, pagination et mutations (CRUD).
+- une séparation claire entre UI state et données serveur,
+- une gestion robuste des loading, empty et error states,
+- une base scalable pour les opérations CRUD.
 
 ---
 
@@ -94,9 +109,9 @@ Cette approche garantit :
 
 L’application suit une approche **mobile-first** avec des breakpoints progressifs :
 
-* Mobile : layouts empilés, menu hamburger,
-* Tablet : grilles intermédiaires, filtres adaptatifs,
-* Desktop : dashboards complets et interactions avancées.
+- Mobile : layouts empilés, tableau scrollable horizontalement, menu hamburger,
+- Tablet : grilles intermédiaires et filtres adaptatifs,
+- Desktop : dashboards complets et interactions avancées.
 
 Les composants du design system sont conçus pour s’adapter naturellement à ces contraintes.
 
@@ -107,8 +122,11 @@ Les composants du design system sont conçus pour s’adapter naturellement à c
 Le projet est structuré pour permettre :
 
 * des tests unitaires ciblés sur les composants clés,
+* une validation fonctionnelle des parcours clés,
 * une validation visuelle forte du design system,
 * une réduction des régressions grâce à la réutilisation stricte des composants.
+
+Aucun framework de test automatisé n’a été introduit afin de rester dans le scope et le timing.
 
 ---
 
@@ -116,7 +134,7 @@ Le projet est structuré pour permettre :
 
 Plusieurs choix visent à garantir de bonnes performances :
 
-* React Query pour limiter les requêtes inutiles,
+* React Query pour limiter les requêtes inutiles (cache et déduplication) ,
 * découpage par features pour réduire les dépendances,
 * composants UI simples et peu coûteux en rendu.
 
