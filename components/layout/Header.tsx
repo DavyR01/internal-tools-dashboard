@@ -28,42 +28,32 @@ export default function Header() {
    const pathname = usePathname();
 
    const [dark, setDark] = useState(false);
-   const [hydrated, setHydrated] = useState(false);
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
 
-   // 1) Hydrate theme ONCE (read localStorage before any write)
+
+
+
    useEffect(() => {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
-
-      if (saved === "dark") {
-         setDark(true);
-         document.documentElement.classList.toggle("dark", true);
-      } else if (saved === "light") {
-         setDark(false);
-         document.documentElement.classList.toggle("dark", false);
-      } else {
-         // No value saved: keep default (light). We still sync class with current state.
-         document.documentElement.classList.toggle("dark", false);
-      }
-
-      setHydrated(true);
+      setDark(saved === "dark");
    }, []);
 
-   // 2) Apply + persist when user toggles (only after hydration)
    useEffect(() => {
-      if (!hydrated) return;
-
       document.documentElement.classList.toggle("dark", dark);
       localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
-   }, [dark, hydrated]);
+   }, [dark]);
+
+
 
    // Close overlays on route change
    useEffect(() => {
       setMobileOpen(false);
       setSearchOpen(false);
    }, [pathname]);
+
+
 
    // Shared ESC + body scroll lock for any overlay
    useEffect(() => {
@@ -94,6 +84,9 @@ export default function Header() {
          body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
+
+
+
 
    return (
       <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">

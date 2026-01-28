@@ -20,6 +20,22 @@ export default function RootLayout({
 }>) {
    return (
       <html lang="fr" className={inter.variable}>
+         <head>
+            <script
+               dangerouslySetInnerHTML={{
+                  __html: `
+                     (function() {
+                     try {
+                        var key = "it-dashboard-theme";
+                        var saved = localStorage.getItem(key);
+                        var isDark = saved === "dark";
+                        document.documentElement.classList.toggle("dark", isDark);
+                     } catch (e) {}
+                     })();
+                     `,
+               }}
+            />
+         </head>
          <body className="font-sans">
             <Providers>{children}</Providers>
          </body>
