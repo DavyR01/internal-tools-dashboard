@@ -12,6 +12,7 @@ import {
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useTopToolsByCost } from "../queries";
+import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
 
 type Tool = {
    id: number;
@@ -35,42 +36,6 @@ function normalizeMonthlyCost(value: unknown) {
 function truncateLabel(label: string, max = 14) {
    return label.length > max ? `${label.slice(0, max)}…` : label;
 }
-
-
-type RechartsTooltipContentProps = {
-   active?: boolean;
-   label?: string;
-   payload?: ReadonlyArray<{
-      value?: number | string;
-      name?: string;
-      payload?: { name?: string };
-   }>;
-};
-
-function TopToolsTooltip({
-   active,
-   payload,
-   euro,
-}: RechartsTooltipContentProps & { euro: Intl.NumberFormat }) {
-   if (!active || !payload?.length) return null;
-
-   const row = payload[0];
-   const toolName =
-      row?.payload?.name || row?.name || "Tool";
-
-   const raw = row?.value;
-   const value = typeof raw === "number" ? raw : Number(raw ?? 0);
-
-   return (
-      <div className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text shadow-sm">
-         <div className="font-medium">{toolName}</div>
-         <div className="mt-1 text-xs text-muted">
-            Monthly cost: <span className="text-text">{euro.format(value)}</span>
-         </div>
-      </div>
-   );
-}
-
 
 export default function TopToolsChart() {
    const { data, isLoading, isError } = useTopToolsByCost();
@@ -174,9 +139,11 @@ export default function TopToolsChart() {
                         />
                         <Tooltip
                            content={(props) => (
-                              <TopToolsTooltip
+                              <ChartTooltip
                                  {...(props as unknown as RechartsTooltipContentProps)}
                                  euro={euro}
+                                 valueLabel="Monthly cost"
+                                 getTitle={({ payloadItem }) => (payloadItem?.name as string) ?? "Tool"}
                               />
                            )}
                            cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
@@ -212,9 +179,11 @@ export default function TopToolsChart() {
                         />
                         <Tooltip
                            content={(props) => (
-                              <TopToolsTooltip
+                              <ChartTooltip
                                  {...(props as unknown as RechartsTooltipContentProps)}
                                  euro={euro}
+                                 valueLabel="Monthly cost"
+                                 getTitle={({ payloadItem }) => (payloadItem?.name as string) ?? "Tool"}
                               />
                            )}
                            cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}

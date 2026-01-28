@@ -12,36 +12,9 @@ import {
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useAnalyticsOverview } from "../queries";
+import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
 
-type RechartsTooltipContentProps = {
-   active?: boolean;
-   label?: string;
-   payload?: ReadonlyArray<{
-      value?: number | string;
-      name?: string;
-   }>;
-};
 
-function CustomTooltip({
-   active,
-   payload,
-   label,
-   euro,
-}: RechartsTooltipContentProps & { euro: Intl.NumberFormat }) {
-   if (!active || !payload?.length) return null;
-
-   const raw = payload[0]?.value;
-   const value = typeof raw === "number" ? raw : Number(raw ?? 0);
-
-   return (
-      <div className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text shadow-sm">
-         <div className="font-medium">{label}</div>
-         <div className="mt-1 text-xs text-muted">
-            Spend: <span className="text-text">{euro.format(value)}</span>
-         </div>
-      </div>
-   );
-}
 
 export default function CostEvolutionChart() {
    const { data, isLoading, isError } = useAnalyticsOverview();
@@ -131,9 +104,11 @@ export default function CostEvolutionChart() {
                      />
                      <Tooltip
                         content={(props) => (
-                           <CustomTooltip
+                           <ChartTooltip
                               {...(props as unknown as RechartsTooltipContentProps)}
                               euro={euro}
+                              valueLabel="Spend"
+                              getTitle={({ label }) => label ?? "Month"}
                            />
                         )}
                         cursor={{ stroke: "rgb(var(--border))", strokeWidth: 1 }}
