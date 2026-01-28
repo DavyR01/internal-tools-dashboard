@@ -13,11 +13,12 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useAnalyticsOverview } from "../queries";
 import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 
 
 export default function CostEvolutionChart() {
-   const { data, isLoading, isError } = useAnalyticsOverview();
+   const { data, isLoading, isError, refetch } = useAnalyticsOverview();
 
    const euro = new Intl.NumberFormat("fr-FR", {
       style: "currency",
@@ -45,10 +46,16 @@ export default function CostEvolutionChart() {
       return (
          <Card>
             <CardHeader>
-               <p className="text-sm text-muted">
-                  Unable to load spend evolution.
-               </p>
+               <h3 className="text-sm font-medium">Monthly spend evolution</h3>
+               <p className="mt-1 text-xs text-muted">Total monthly spend trend.</p>
             </CardHeader>
+            <CardContent>
+               <ErrorState
+                  title="Unable to load spend evolution"
+                  description="Please check your connection and try again."
+                  onRetry={refetch}
+               />
+            </CardContent>
          </Card>
       );
    }
