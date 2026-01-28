@@ -3,6 +3,7 @@
 import { Table, THead, TH, TR, TD } from "@/components/ui/Table";
 import { StatusBadge } from "@/components/ui/Badge";
 import { useRecentTools } from "../queries";
+import { Calendar } from "lucide-react";
 
 export default function RecentToolsTable() {
    const { data, isLoading } = useRecentTools();
@@ -13,17 +14,27 @@ export default function RecentToolsTable() {
 
    return (
       <div className="rounded-2xl border border-border bg-surface shadow-sm overflow-x-auto">
+         {/* Header interne */}
+         <div className="flex items-center justify-between px-4 py-5">
+            <h3 className="text-lg font-semibold">Recent Tools</h3>
+
+            <div className="flex items-center gap-2 text-xs text-muted">
+               <Calendar className="h-4 w-4" />
+               <span>Last 30 days</span>
+            </div>
+         </div>
+
          {/* Scroll container */}
          <div className="min-w-185">
             <Table className=" bg-surface">
                <THead>
-                  <tr>
+                  <TR className="border-t-0">
                      <TH>Tool</TH>
                      <TH>Department</TH>
                      <TH>Users</TH>
                      <TH className="text-left">Monthly Cost</TH>
                      <TH>Status</TH>
-                  </tr>
+                  </TR>
                </THead>
                <tbody>
                   {data.map((tool: any) => (

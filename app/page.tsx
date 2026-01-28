@@ -14,7 +14,6 @@ export default function DashboardPage() {
             </div>
             <KpiCards />
             <div>
-               <h2 className="mb-3 text-lg font-medium">Recent tools</h2>
                <RecentToolsTable />
             </div>
          </div>
