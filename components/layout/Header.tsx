@@ -107,7 +107,7 @@ export default function Header() {
             <div className="flex-1" />
 
             {/* Search */}
-            <div className="relative hidden w-90 max-w-[40vw] md:block">
+            <div className="relative hidden w-90 max-w-[40vw] lg:block">
                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
                <input
                   className="h-10 w-full rounded-xl border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
@@ -117,12 +117,22 @@ export default function Header() {
 
             <button
                type="button"
+               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border lg:hidden"
+               aria-label="Search"
+            >
+               <Search className="h-5 w-5" />
+            </button>
+
+            {/* Search icon (below lg) */}
+            <button
+               type="button"
                onClick={() => setDark((v) => !v)}
                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
                aria-label="Toggle theme"
             >
                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
+
 
 
             {/* Notifications */}
