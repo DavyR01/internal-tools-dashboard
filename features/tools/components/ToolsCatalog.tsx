@@ -130,7 +130,7 @@ export default function ToolsCatalog() {
                   <div className="space-y-1">
                      <div className="text-xs text-muted">Status</div>
                      <select
-                        className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                        className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm outline-none focus:ring-1"
                         value={status}
                         onChange={(e) => {
                            setStatus(e.target.value as any);
@@ -147,7 +147,7 @@ export default function ToolsCatalog() {
                   <div className="space-y-1">
                      <div className="text-xs text-muted">Department</div>
                      <select
-                        className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                        className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm outline-none focus:ring-1 focus:ring-ring/30"
                         value={department}
                         onChange={(e) => {
                            setDepartment(e.target.value);
@@ -166,7 +166,7 @@ export default function ToolsCatalog() {
                   <div className="space-y-1">
                      <div className="text-xs text-muted">Sort</div>
                      <select
-                        className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                        className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm outline-none focus:ring-1 focus:ring-ring/30"
                         value={`${sortBy}:${order}`}
                         onChange={(e) => {
                            const [sb, ord] = e.target.value.split(":");
