@@ -180,14 +180,16 @@ export default function Header() {
             </button>
 
             {/* Settings */}
+            {/* Settings */}
             <button
                type="button"
-               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border opacity-80 hover:opacity-100"
+               className="hidden xs:inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border opacity-80 hover:opacity-100"
                aria-label="Settings"
                disabled
             >
                <Settings className="h-5 w-5" />
             </button>
+
 
 
             {/* Avatar */}
@@ -252,7 +254,7 @@ export default function Header() {
                            return (
                               <div
                                  key={item.label}
-                                 className="flex items-center rounded-xl px-3 py-2 text-sm opacity-40 cursor-not-allowed"
+                                 className="flex items-center rounded-xl px-3 py-2 text-sm opacity-40 cursor-default"
                                  aria-disabled="true"
                               >
                                  {item.label}
