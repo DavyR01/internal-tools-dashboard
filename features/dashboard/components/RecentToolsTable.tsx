@@ -28,7 +28,36 @@ export default function RecentToolsTable() {
                <tbody>
                   {data.map((tool: any) => (
                      <TR key={tool.id}>
-                        <TD className="font-medium">{tool.name}</TD>
+                        <TD>
+                           <div className="flex items-center gap-3">
+                              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-elevated">
+                                 {tool.icon_url ? (
+                                    <img
+                                       src={tool.icon_url}
+                                       alt={tool.name}
+                                       className="h-full w-full object-contain p-1"
+                                       loading="lazy"
+                                       onError={(e) => {
+                                          e.currentTarget.style.display = "none";
+                                          const parent = e.currentTarget.parentElement;
+                                          if (!parent) return;
+                                          parent.classList.add("text-xs", "font-semibold", "text-muted");
+                                          parent.textContent = tool.name?.charAt(0) ?? "—";
+                                       }} />
+                                 ) : (
+                                    <span className="text-xs font-semibold text-muted">
+                                       {tool.name?.charAt(0)}
+                                    </span>
+                                 )}
+                              </div>
+
+                              <div className="min-w-0">
+                                 <div className="truncate font-medium" title={tool.name}>
+                                    {tool.name}
+                                 </div>
+                              </div>
+                           </div>
+                        </TD>
                         <TD>{tool.owner_department}</TD>
                         <TD>{tool.active_users_count}</TD>
                         <TD className="text-left">€{tool.monthly_cost}</TD>
