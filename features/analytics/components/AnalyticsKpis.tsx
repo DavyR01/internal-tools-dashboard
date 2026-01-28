@@ -2,6 +2,7 @@
 
 import { Card, CardHeader } from "@/components/ui/Card";
 import { useAnalyticsOverview } from "../queries";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 function KpiCard({
    label,
@@ -24,7 +25,7 @@ function KpiCard({
 }
 
 export default function AnalyticsKpis() {
-   const { data, isLoading, isError } = useAnalyticsOverview();
+   const { data, isLoading, isError, refetch } = useAnalyticsOverview();
 
    if (isLoading) {
       return (
@@ -44,16 +45,13 @@ export default function AnalyticsKpis() {
 
    if (isError || !data) {
       return (
-         <Card>
-            <CardHeader>
-               <p className="text-sm text-muted">
-                  Analytics data could not be loaded.
-               </p>
-            </CardHeader>
-         </Card>
+         <ErrorState
+            title="Unable to load analytics KPIs"
+            description="Please check your connection and try again."
+            onRetry={refetch}
+         />
       );
    }
-
    const { budget_overview, cost_analytics } = data;
 
    return (
