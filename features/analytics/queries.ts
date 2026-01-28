@@ -12,13 +12,11 @@ export function useAnalyticsOverview() {
    });
 }
 
-export function useTopToolsByCost(limit = 5) {
+export function useTopToolsByCost() {
    return useQuery({
-      queryKey: queryKeys.analytics.topTools(limit),
+      queryKey: queryKeys.analytics.topTools(),
       queryFn: async () => {
-         const { data } = await api.get(
-            `/tools?_sort=monthly_cost&_order=desc&_limit=${limit}`
-         );
+         const { data } = await api.get("/tools?_limit=1000");
          return data;
       },
    });

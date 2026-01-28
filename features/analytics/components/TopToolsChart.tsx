@@ -19,7 +19,7 @@ type Tool = {
 };
 
 export default function TopToolsChart() {
-   const { data, isLoading, isError } = useTopToolsByCost(5);
+   const { data, isLoading, isError } = useTopToolsByCost();
 
    if (isLoading) {
       return (
@@ -49,7 +49,23 @@ export default function TopToolsChart() {
       );
    }
 
-   const tools = data as Tool[];
+   const normalizeMonthlyCost = (value: unknown) => {
+      if (value == null) return 0;
+
+      // gère: number, "900", "€900", "900 €"
+      const cleaned = String(value).replace(/[^\d.-]/g, "");
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : 0;
+   };
+
+   const tools = (data as Tool[])
+      .map((t) => ({
+         ...t,
+         monthly_cost: normalizeMonthlyCost(t.monthly_cost),
+      }))
+      .filter((t) => t.monthly_cost > 0)
+      .sort((a, b) => b.monthly_cost - a.monthly_cost)
+      .slice(0, 5);
 
    return (
       <Card>
