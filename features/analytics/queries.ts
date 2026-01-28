@@ -23,3 +23,13 @@ export function useTopToolsByCost(limit = 5) {
       },
    });
 }
+
+export function useToolsForDepartmentCostBreakdown() {
+   return useQuery({
+      queryKey: queryKeys.analytics.departmentCosts(),
+      queryFn: async () => {
+         const { data } = await api.get("/tools?_limit=1000");
+         return data;
+      },
+   });
+}
