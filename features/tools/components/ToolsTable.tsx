@@ -66,7 +66,7 @@ export default function ToolsTable({
                   <TR className="border-t-0">
                      <TH
                         className={[
-                           "sticky left-0 z-30 bg-surface",
+                           "sticky left-0 z-[30] bg-surface",
                            TOOL_COL_W,
                            "shadow-[8px_0_12px_-12px_rgba(0,0,0,0.35)]",
                         ].join(" ")}
@@ -81,7 +81,7 @@ export default function ToolsTable({
                      <TH>Status</TH>
                      <TH
                         className={[
-                           "sticky right-0 z-30 bg-surface text-right whitespace-nowrap",
+                           "sticky right-0 z-[30] bg-surface text-right whitespace-nowrap",
                            ACTIONS_COL_W,
                            "shadow-[-8px_0_12px_-12px_rgba(0,0,0,0.35)]",
                         ].join(" ")}
@@ -116,7 +116,7 @@ export default function ToolsTable({
                               {/* TOOL (sticky left) */}
                               <TD
                                  className={[
-                                    "sticky left-0 z-20 bg-surface",
+                                    "sticky left-0 z-[20] bg-surface",
                                     TOOL_COL_W,
                                     "shadow-[8px_0_12px_-12px_rgba(0,0,0,0.35)]",
                                  ].join(" ")}
@@ -163,7 +163,7 @@ export default function ToolsTable({
                               {/* ACTIONS (sticky right) */}
                               <TD
                                  className={[
-                                    "right-0 z-20 bg-surface text-right whitespace-nowrap",
+                                    "right-0 z-[20] bg-surface text-right whitespace-nowrap",
                                     ACTIONS_COL_W,
                                  ].join(" ")}
                               >

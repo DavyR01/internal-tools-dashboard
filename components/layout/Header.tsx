@@ -93,7 +93,7 @@ export default function Header() {
 
 
    return (
-      <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
+      <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
          <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-2 px-3 md:gap-3 md:px-4">
             {/* Mobile */}
             <button
@@ -220,7 +220,7 @@ export default function Header() {
                   {/* Backdrop */}
                   <button
                      type="button"
-                     className="fixed inset-0 z-100 bg-black/50"
+                     className="fixed inset-0 z-[100] bg-black/50"
                      aria-label="Close menu"
                      onClick={() => setMobileOpen(false)}
                   />
@@ -230,7 +230,7 @@ export default function Header() {
                      id="mobile-nav"
                      role="dialog"
                      aria-modal="true"
-                     className="fixed left-0 top-0 z-110 h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg"
+                     className="fixed left-0 top-0 z-[110] h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg"
                   >
                      <div className="flex items-center gap-2">
                         <div className="h-8 w-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500" />
@@ -301,7 +301,7 @@ export default function Header() {
                   {/* Backdrop */}
                   <button
                      type="button"
-                     className="fixed inset-0 z-100 bg-black/50"
+                     className="fixed inset-0 z-[100] bg-black/50"
                      aria-label="Close search"
                      onClick={() => setSearchOpen(false)}
                   />
@@ -311,7 +311,7 @@ export default function Header() {
                      id="search-modal"
                      role="dialog"
                      aria-modal="true"
-                     className="fixed left-1/2 top-24 z-110 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
+                     className="fixed left-1/2 top-24 z-[110] w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
                   >
                      <div className="flex items-center gap-2">
                         <div className="text-sm font-semibold">Search</div>
