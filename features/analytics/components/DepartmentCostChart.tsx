@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useToolsForDepartmentCostBreakdown } from "../queries";
 import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 
 type Tool = {
@@ -34,7 +35,7 @@ function buildDepartmentCostData(tools: Tool[]) {
 }
 
 export default function DepartmentCostChart() {
-   const { data, isLoading, isError } = useToolsForDepartmentCostBreakdown();
+   const { data, isLoading, isError, refetch } = useToolsForDepartmentCostBreakdown();
 
    if (isLoading) {
       return (
@@ -56,10 +57,18 @@ export default function DepartmentCostChart() {
       return (
          <Card>
             <CardHeader>
-               <p className="text-sm text-muted">
-                  Unable to load department breakdown.
+               <h3 className="text-sm font-medium">Cost by department</h3>
+               <p className="mt-1 text-xs text-muted">
+                  Share of total monthly spend by department.
                </p>
             </CardHeader>
+            <CardContent>
+               <ErrorState
+                  title="Unable to load department breakdown"
+                  description="Please check your connection and try again."
+                  onRetry={refetch}
+               />
+            </CardContent>
          </Card>
       );
    }
