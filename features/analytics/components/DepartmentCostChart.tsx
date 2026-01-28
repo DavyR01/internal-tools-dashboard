@@ -96,7 +96,7 @@ export default function DepartmentCostChart() {
                         paddingAngle={2}
                      >
                         {chartData.map((_, i) => (
-                           <Cell key={i} fill={fills[i % fills.length]} />
+                           <Cell key={i} fill="rgb(var(--ring))" fillOpacity={fills[i % fills.length]} />
                         ))}
                      </Pie>
                      <Tooltip />

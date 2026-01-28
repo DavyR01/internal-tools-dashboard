@@ -15,6 +15,12 @@ import { useAnalyticsOverview } from "../queries";
 export default function CostEvolutionChart() {
    const { data, isLoading, isError } = useAnalyticsOverview();
 
+   const euro = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+   });
+
    if (isLoading) {
       return (
          <Card>
@@ -65,15 +71,28 @@ export default function CostEvolutionChart() {
          <CardContent>
             <div className="h-64">
                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                     <XAxis dataKey="name" />
-                     <YAxis />
-                     <Tooltip />
+                  <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                     <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12 }}
+                     />
+                     <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(v) => euro.format(Number(v))}
+                        width={72}
+                     />
+                     <Tooltip formatter={(v) => euro.format(Number(v))} />
                      <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="hsl(var(--ring))"
+                        stroke="rgb(var(--ring))"
                         strokeWidth={2}
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
                      />
                   </LineChart>
                </ResponsiveContainer>

@@ -82,7 +82,7 @@ export default function TopToolsChart() {
                      />
                      <Bar
                         dataKey="monthly_cost"
-                        fill="hsl(var(--ring))"
+                        fill="rgb(var(--ring))"
                         radius={[4, 4, 4, 4]}
                      />
                   </BarChart>
