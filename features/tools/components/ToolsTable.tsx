@@ -60,7 +60,7 @@ export default function ToolsTable({
 
    return (
       <div className="-mx-4 overflow-x-auto px-4">
-         <div className="min-w-[1200px]">
+         <div className="min-w-300">
             <Table>
                <THead>
                   <TR className="border-t-0">
@@ -139,7 +139,7 @@ export default function ToolsTable({
                                        />
                                     </div>
 
-                                    <div className="min-w-0 max-w-[240px]">
+                                    <div className="min-w-0 max-w-60">
                                        <div className="truncate font-medium" title={tool.name}>
                                           {tool.name}
                                        </div>
