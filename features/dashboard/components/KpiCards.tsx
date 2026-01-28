@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils/cn";
 import { useDashboardAnalytics, useDepartments } from "../queries";
 import { Building2, TrendingUp, Users, Wrench } from "lucide-react";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 /* ---------- UI helpers (spécifiques KPI) ---------- */
 
@@ -73,7 +74,7 @@ function formatBudget(current: number, limit: number) {
 /* ---------- Component ---------- */
 
 export default function KpiCards() {
-   const { data, isLoading } = useDashboardAnalytics();
+   const { data, isLoading, isError, refetch } = useDashboardAnalytics();
    const { data: departments } = useDepartments();
    const departmentsCount = Array.isArray(departments) ? departments.length : 0;
 
@@ -89,6 +90,23 @@ export default function KpiCards() {
          </div>
       );
    }
+
+   if (isError) {
+      return (
+         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+               <ErrorState
+                  key={i}
+                  title="Unable to load dashboard KPIs"
+                  description="Please check your connection and try again."
+                  onRetry={refetch}
+                  className="h-35"
+               />
+            ))}
+         </div>
+      );
+   }
+
 
    const { budget_overview, cost_analytics, kpi_trends } = data;
 
