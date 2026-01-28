@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { Bell, Menu, Search, Sun, Moon, X, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import MobileDrawer from "@/components/layout/MobileDrawer";
 
-const navItems = [
+export const navItems = [
    { label: "Dashboard", href: "/" },
    { label: "Tools", href: "/tools" },
    { label: "Analytics", href: "/analytics" },
@@ -28,36 +29,30 @@ export default function Header() {
    const pathname = usePathname();
 
    const [dark, setDark] = useState(false);
+   const [hydrated, setHydrated] = useState(false);
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
-   const [hydrated, setHydrated] = useState(false);
 
-
-
-
+   // Load persisted theme (do not write before hydration)
    useEffect(() => {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      const isDark = saved === "dark";
-      setDark(isDark);
+      setDark(saved === "dark");
       setHydrated(true);
    }, []);
 
+   // Apply + persist theme
    useEffect(() => {
       if (!hydrated) return;
       document.documentElement.classList.toggle("dark", dark);
       localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
    }, [dark, hydrated]);
 
-
-
    // Close overlays on route change
    useEffect(() => {
       setMobileOpen(false);
       setSearchOpen(false);
    }, [pathname]);
-
-
 
    // Shared ESC + body scroll lock for any overlay
    useEffect(() => {
@@ -72,7 +67,6 @@ export default function Header() {
       document.addEventListener("keydown", onKeyDown);
 
       const body = document.body;
-
       const prevOverflow = body.style.overflow;
       const prevPaddingRight = body.style.paddingRight;
 
@@ -88,9 +82,6 @@ export default function Header() {
          body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
-
-
-
 
    return (
       <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
@@ -151,17 +142,22 @@ export default function Header() {
 
             <div className="flex-1" />
 
-            {/* Search */}
+            {/* Search desktop */}
             <div className="relative hidden w-90 max-w-[40vw] lg:block">
                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
+
+               <label htmlFor="header-search" className="sr-only">
+                  Search tools
+               </label>
                <input
-                  className="h-10 w-full rounded-xl border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
-                  placeholder="Search Tools..."
                   id="header-search"
                   aria-label="Search tools"
+                  className="h-10 w-full rounded-xl border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
+                  placeholder="Search Tools..."
                />
             </div>
 
+            {/* Search icon under lg */}
             <button
                type="button"
                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border lg:hidden"
@@ -216,87 +212,12 @@ export default function Header() {
          </div>
 
          {/* Mobile nav (drawer) */}
-         {mobileOpen && (
-            <Portal>
-               <div className="md:hidden">
-                  {/* Backdrop */}
-                  <button
-                     type="button"
-                     className="fixed inset-0 z-[100] bg-black/50"
-                     aria-label="Close menu"
-                     onClick={() => setMobileOpen(false)}
-                  />
-
-                  {/* Panel */}
-                  <div
-                     id="mobile-nav"
-                     role="dialog"
-                     aria-modal="true"
-                     className="fixed left-0 top-0 z-[110] h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg"
-                  >
-                     <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500" />
-                        <div className="text-md font-semibold">TechCorp</div>
-
-                        <div className="flex-1" />
-                        <button
-                           type="button"
-                           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
-                           aria-label="Close menu"
-                           onClick={() => setMobileOpen(false)}
-                        >
-                           <X className="h-5 w-5" />
-                        </button>
-                     </div>
-
-                     {/* Search (mobile) */}
-                     <div className="relative mt-4">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
-                        <input
-                           id="drawer-search"
-                           aria-label="Search tools"
-                           className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
-                           placeholder="Search Tools..."
-                        />
-                     </div>
-
-                     <nav className="mt-4 grid gap-1">
-                        {navItems.map((item) => {
-                           const active = pathname === item.href;
-
-                           if (item.disabled) {
-                              return (
-                                 <div
-                                    key={item.label}
-                                    className="flex items-center rounded-xl px-3 py-2 text-sm opacity-40 cursor-default"
-                                    aria-disabled="true"
-                                 >
-                                    {item.label}
-                                 </div>
-                              );
-                           }
-
-                           return (
-                              <Link
-                                 key={item.href}
-                                 href={item.href}
-                                 onClick={() => setMobileOpen(false)}
-                                 className={[
-                                    "flex items-center rounded-xl px-3 py-2 text-sm transition",
-                                    active
-                                       ? "font-semibold"
-                                       : "opacity-80 hover:bg-black/5 hover:opacity-100 dark:hover:bg-white/5",
-                                 ].join(" ")}
-                              >
-                                 {item.label}
-                              </Link>
-                           );
-                        })}
-                     </nav>
-                  </div>
-               </div>
-            </Portal>
-         )}
+         <MobileDrawer
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            pathname={pathname}
+            navItems={navItems}
+         />
 
          {/* Search modal */}
          {searchOpen && (
@@ -332,6 +253,10 @@ export default function Header() {
 
                      <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
+
+                        <label htmlFor="modal-search" className="sr-only">
+                           Search tools
+                        </label>
                         <input
                            id="modal-search"
                            aria-label="Search tools"
