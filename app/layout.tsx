@@ -19,7 +19,7 @@ export default function RootLayout({
    children: React.ReactNode;
 }>) {
    return (
-      <html lang="fr" className={inter.variable}>
+      <html lang="fr" className={inter.variable} suppressHydrationWarning>
          <head>
             <script
                dangerouslySetInnerHTML={{

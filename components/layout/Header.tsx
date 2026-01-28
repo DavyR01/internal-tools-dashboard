@@ -31,19 +31,23 @@ export default function Header() {
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
+   const [hydrated, setHydrated] = useState(false);
 
 
 
 
    useEffect(() => {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      setDark(saved === "dark");
+      const isDark = saved === "dark";
+      setDark(isDark);
+      setHydrated(true);
    }, []);
 
    useEffect(() => {
+      if (!hydrated) return;
       document.documentElement.classList.toggle("dark", dark);
       localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
-   }, [dark]);
+   }, [dark, hydrated]);
 
 
 
