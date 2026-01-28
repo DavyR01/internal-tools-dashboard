@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, Search, Sun, Moon, X } from "lucide-react";
+import { Bell, Menu, Search, Sun, Moon, X, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 
 
@@ -10,7 +10,7 @@ const navItems = [
    { label: "Dashboard", href: "/" },
    { label: "Tools", href: "/tools" },
    { label: "Analytics", href: "/analytics" },
-   { label: "Settings", href: "" },
+   { label: "Settings", href: "", disabled: true },
 ];
 
 function cx(...classes: Array<string | false | undefined>) {
@@ -74,6 +74,19 @@ export default function Header() {
             <nav className="ml-6 hidden items-center gap-1 md:flex">
                {navItems.map((item) => {
                   const active = pathname === item.href;
+
+                  if (item.disabled) {
+                     return (
+                        <div
+                           key={item.label}
+                           className="rounded-lg px-3 py-2 text-sm opacity-40 cursor-default"
+                           aria-disabled="true"
+                        >
+                           {item.label}
+                        </div>
+                     );
+                  }
+
                   return (
                      <Link
                         key={item.href}
@@ -123,6 +136,17 @@ export default function Header() {
                   3
                </span>
             </button>
+
+            {/* Settings */}
+            <button
+               type="button"
+               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border opacity-80 hover:opacity-100"
+               aria-label="Settings"
+               disabled
+            >
+               <Settings className="h-5 w-5" />
+            </button>
+
 
             {/* Avatar */}
             <button
@@ -181,6 +205,18 @@ export default function Header() {
                   <nav className="mt-4 grid gap-1">
                      {navItems.map((item) => {
                         const active = pathname === item.href;
+
+                        if (item.disabled) {
+                           return (
+                              <div
+                                 key={item.label}
+                                 className="flex items-center rounded-xl px-3 py-2 text-sm opacity-40 cursor-not-allowed"
+                                 aria-disabled="true"
+                              >
+                                 {item.label}
+                              </div>
+                           );
+                        }
 
                         return (
                            <Link
