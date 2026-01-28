@@ -21,6 +21,7 @@ export default function Header() {
    const pathname = usePathname();
    const [dark, setDark] = useState(false);
    const [mobileOpen, setMobileOpen] = useState(false);
+   const [searchOpen, setSearchOpen] = useState(false);
 
    useEffect(() => {
       document.documentElement.classList.toggle("dark", dark);
@@ -46,6 +47,34 @@ export default function Header() {
          document.body.style.overflow = prevOverflow;
       };
    }, [mobileOpen]);
+
+   useEffect(() => {
+      if (!mobileOpen && !searchOpen) return;
+
+      const onKeyDown = (e: KeyboardEvent) => {
+         if (e.key === "Escape") {
+            setMobileOpen(false);
+            setSearchOpen(false);
+         }
+      };
+      document.addEventListener("keydown", onKeyDown);
+
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      return () => {
+         document.removeEventListener("keydown", onKeyDown);
+         document.body.style.overflow = prevOverflow;
+      };
+   }, [mobileOpen, searchOpen]);
+
+   useEffect(() => {
+      setSearchOpen(false);
+   }, [pathname]);
+
+
+
+
 
    return (
       <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
@@ -119,6 +148,9 @@ export default function Header() {
                type="button"
                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border lg:hidden"
                aria-label="Search"
+               onClick={() => setSearchOpen(true)}
+               aria-expanded={searchOpen}
+               aria-controls="search-modal"
             >
                <Search className="h-5 w-5" />
             </button>
@@ -245,10 +277,53 @@ export default function Header() {
                         );
                      })}
                   </nav>
-
                </div>
             </div>
          )}
+
+
+         {searchOpen && (
+            <div className="lg:hidden">
+               {/* Backdrop */}
+               <button
+                  type="button"
+                  className="fixed inset-0 z-40 bg-black/30"
+                  aria-label="Close search"
+                  onClick={() => setSearchOpen(false)}
+               />
+
+               {/* Modal */}
+               <div
+                  id="search-modal"
+                  role="dialog"
+                  aria-modal="true"
+                  className="fixed left-1/2 top-24 z-50 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
+               >
+                  <div className="flex items-center gap-2">
+                     <div className="text-sm font-semibold">Search</div>
+                     <div className="flex-1" />
+                     <button
+                        type="button"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
+                        aria-label="Close search"
+                        onClick={() => setSearchOpen(false)}
+                     >
+                        <X className="h-5 w-5" />
+                     </button>
+                  </div>
+
+                  <div className="relative mt-3">
+                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
+                     <input
+                        autoFocus
+                        className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
+                        placeholder="Search Tools..."
+                     />
+                  </div>
+               </div>
+            </div>
+         )}
+
 
       </header>
    );
