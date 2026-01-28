@@ -124,14 +124,25 @@ Les composants du design system sont conçus pour s’adapter naturellement à c
 
 ## 🧪 Testing Strategy
 
-Le projet est structuré pour permettre :
+L’application inclut des **tests unitaires ciblés** afin de sécuriser les composants et interactions critiques,
+sans surcharger le scope du test technique.
 
-* des tests unitaires ciblés sur les composants clés,
-* une validation fonctionnelle des parcours clés,
-* une validation visuelle forte du design system,
-* une réduction des régressions grâce à la réutilisation stricte des composants.
+Stack utilisée :
+- **Jest** comme test runner,
+- **React Testing Library** pour tester les comportements utilisateur.
 
-Aucun framework de test automatisé n’a été introduit afin de rester dans le scope et le timing.
+Les tests se concentrent volontairement sur :
+- les états UI critiques (loading, empty, error),
+- les composants mutualisés (AnalyticsWidget),
+- les interactions métier clés (enable / disable tool, modales).
+
+Les visualisations (Recharts) et le design system ne sont pas testés de manière exhaustive
+afin de privilégier la robustesse et la maintenabilité.
+
+### Lancer les tests
+```bash
+npm test
+```
 
 ---
 
