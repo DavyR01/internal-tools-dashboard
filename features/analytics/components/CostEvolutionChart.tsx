@@ -7,6 +7,7 @@ import {
    YAxis,
    Tooltip,
    ResponsiveContainer,
+   CartesianGrid,
 } from "recharts";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
@@ -60,6 +61,12 @@ export default function CostEvolutionChart() {
       },
    ];
 
+   const values = chartData.map((d) => d.value);
+   const min = Math.min(...values);
+   const max = Math.max(...values);
+   const padding = (max - min) * 0.1 || max * 0.05;
+
+
    return (
       <Card>
          <CardHeader>
@@ -72,6 +79,12 @@ export default function CostEvolutionChart() {
             <div className="h-64">
                <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                     <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="rgb(var(--muted))"
+                        strokeOpacity={0.4}
+                        vertical={false}
+                     />
                      <XAxis
                         dataKey="name"
                         axisLine={false}
@@ -84,6 +97,7 @@ export default function CostEvolutionChart() {
                         tick={{ fontSize: 12 }}
                         tickFormatter={(v) => euro.format(Number(v))}
                         width={72}
+                        domain={[min - padding, max + padding]}
                      />
                      <Tooltip formatter={(v) => euro.format(Number(v))} />
                      <Line
