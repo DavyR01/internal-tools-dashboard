@@ -20,8 +20,8 @@
 
 /* Dark mode tokens */
 .dark {
-   --bg: 10 10 12;
-   --surface: 14 14 18;
+   --surface: 10 10 12;
+   --bg: 14 14 18;
    --elevated: 18 18 24;
 
    --text: 245 245 247;
