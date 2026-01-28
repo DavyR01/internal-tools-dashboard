@@ -13,4 +13,9 @@ export const queryKeys = {
       topTools: () => ["analytics", "top-tools"],
       departmentCosts: () => ["analytics", "department-costs"],
    },
+
+   dashboard: {
+      all: ["dashboard"] as const,
+      departments: () => ["dashboard", "departments"] as const,
+   },
 };

@@ -23,3 +23,13 @@ export function useRecentTools() {
       },
    });
 }
+
+export function useDepartments() {
+   return useQuery({
+      queryKey: queryKeys.dashboard.departments(),
+      queryFn: async () => {
+         const { data } = await api.get("/departments");
+         return data;
+      },
+   });
+}

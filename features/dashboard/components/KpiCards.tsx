@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils/cn";
-import { useDashboardAnalytics } from "../queries";
+import { useDashboardAnalytics, useDepartments } from "../queries";
 import { Building2, TrendingUp, Users, Wrench } from "lucide-react";
 
 /* ---------- UI helpers (spécifiques KPI) ---------- */
@@ -69,10 +69,13 @@ function formatBudget(current: number, limit: number) {
    );
 }
 
+
 /* ---------- Component ---------- */
 
 export default function KpiCards() {
    const { data, isLoading } = useDashboardAnalytics();
+   const { data: departments } = useDepartments();
+   const departmentsCount = Array.isArray(departments) ? departments.length : 0;
 
    if (isLoading) {
       return (
@@ -114,9 +117,7 @@ export default function KpiCards() {
          label: "Departments",
          tone: "orangered" as const,
          icon: Building2,
-         value: kpi_trends.departments_change
-            ? budget_overview.departments ?? "_"
-            : "",
+         value: departmentsCount || "_",
          trend: kpi_trends.departments_change,
       },
       {

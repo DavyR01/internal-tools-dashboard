@@ -21,7 +21,7 @@ export default function RecentToolsTable() {
                      <TH>Tool</TH>
                      <TH>Department</TH>
                      <TH>Users</TH>
-                     <TH className="text-right">Monthly Cost</TH>
+                     <TH className="text-left">Monthly Cost</TH>
                      <TH>Status</TH>
                   </tr>
                </THead>
@@ -31,7 +31,7 @@ export default function RecentToolsTable() {
                         <TD className="font-medium">{tool.name}</TD>
                         <TD>{tool.owner_department}</TD>
                         <TD>{tool.active_users_count}</TD>
-                        <TD className="text-right">€{tool.monthly_cost}</TD>
+                        <TD className="text-left">€{tool.monthly_cost}</TD>
                         <TD>
                            <StatusBadge status={tool.status} />
                         </TD>
