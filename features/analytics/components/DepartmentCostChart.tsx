@@ -10,6 +10,8 @@ import {
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useToolsForDepartmentCostBreakdown } from "../queries";
+import ChartTooltip, { RechartsTooltipContentProps } from "@/components/ui/ChartToolTip";
+
 
 type Tool = {
    id: number;
@@ -64,15 +66,13 @@ export default function DepartmentCostChart() {
 
    const tools = data as Tool[];
    const chartData = buildDepartmentCostData(tools);
+   const opacities = [0.95, 0.75, 0.55, 0.4, 0.28, 0.2];
 
-   const fills = [
-      "rgba(var(--ring), 0.95)",
-      "rgba(var(--ring), 0.75)",
-      "rgba(var(--ring), 0.55)",
-      "rgba(var(--ring), 0.40)",
-      "rgba(var(--ring), 0.28)",
-      "rgba(var(--ring), 0.20)",
-   ];
+   const euro = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+   });
 
    return (
       <Card>
@@ -96,10 +96,26 @@ export default function DepartmentCostChart() {
                         paddingAngle={2}
                      >
                         {chartData.map((_, i) => (
-                           <Cell key={i} fill="rgb(var(--ring))" fillOpacity={fills[i % fills.length]} />
+                           <Cell
+                              key={i}
+                              fill="rgb(var(--ring))"
+                              fillOpacity={opacities[i % opacities.length]}
+                              stroke="rgb(var(--surface))"
+                              strokeWidth={2}
+                           />
                         ))}
                      </Pie>
-                     <Tooltip />
+                     <Tooltip
+                        content={(props) => (
+                           <ChartTooltip
+                              {...(props as unknown as RechartsTooltipContentProps)}
+                              euro={euro}
+                              valueLabel="Monthly spend"
+                              getTitle={({ payloadItem }) => (payloadItem?.name as string) ?? "Department"}
+                           />
+                        )}
+                        cursor={{ fill: "rgb(var(--muted))", fillOpacity: 0.08 }}
+                     />
                   </PieChart>
                </ResponsiveContainer>
             </div>

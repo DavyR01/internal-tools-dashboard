@@ -17,7 +17,7 @@ function KpiCard({
          <CardHeader>
             <p className="text-xs text-muted">{label}</p>
             <p className="mt-2 text-2xl font-semibold">{value}</p>
-            <p className="mt-1 text-xs text-muted">{helper}</p>
+            <p className="mt-1 text-xs text-muted pb-4">{helper}</p>
          </CardHeader>
       </Card>
    );
