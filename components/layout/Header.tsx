@@ -13,6 +13,8 @@ const navItems = [
    { label: "Settings", href: "", disabled: true },
 ];
 
+const THEME_STORAGE_KEY = "it-dashboard-theme"; // "dark" | "light"
+
 function cx(...classes: Array<string | false | undefined>) {
    return classes.filter(Boolean).join(" ");
 }
@@ -24,22 +26,46 @@ function Portal({ children }: { children: React.ReactNode }) {
 
 export default function Header() {
    const pathname = usePathname();
+
    const [dark, setDark] = useState(false);
+   const [hydrated, setHydrated] = useState(false);
+
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
 
+   // 1) Hydrate theme ONCE (read localStorage before any write)
    useEffect(() => {
-      document.documentElement.classList.toggle("dark", dark);
-   }, [dark]);
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
 
+      if (saved === "dark") {
+         setDark(true);
+         document.documentElement.classList.toggle("dark", true);
+      } else if (saved === "light") {
+         setDark(false);
+         document.documentElement.classList.toggle("dark", false);
+      } else {
+         // No value saved: keep default (light). We still sync class with current state.
+         document.documentElement.classList.toggle("dark", false);
+      }
+
+      setHydrated(true);
+   }, []);
+
+   // 2) Apply + persist when user toggles (only after hydration)
+   useEffect(() => {
+      if (!hydrated) return;
+
+      document.documentElement.classList.toggle("dark", dark);
+      localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
+   }, [dark, hydrated]);
+
+   // Close overlays on route change
    useEffect(() => {
       setMobileOpen(false);
-   }, [pathname]);
-
-   useEffect(() => {
       setSearchOpen(false);
    }, [pathname]);
 
+   // Shared ESC + body scroll lock for any overlay
    useEffect(() => {
       if (!mobileOpen && !searchOpen) return;
 
@@ -60,9 +86,7 @@ export default function Header() {
          window.innerWidth - document.documentElement.clientWidth;
 
       body.style.overflow = "hidden";
-      if (scrollbarWidth > 0) {
-         body.style.paddingRight = `${scrollbarWidth}px`;
-      }
+      if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
 
       return () => {
          document.removeEventListener("keydown", onKeyDown);
@@ -70,7 +94,6 @@ export default function Header() {
          body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
-
 
    return (
       <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
@@ -151,7 +174,7 @@ export default function Header() {
                <Search className="h-5 w-5" />
             </button>
 
-            {/* Search icon (below lg) */}
+            {/* Theme */}
             <button
                type="button"
                onClick={() => setDark((v) => !v)}
@@ -160,7 +183,6 @@ export default function Header() {
             >
                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-
 
             {/* Notifications */}
             <button
@@ -174,8 +196,7 @@ export default function Header() {
                </span>
             </button>
 
-
-            {/* Settings */}
+            {/* Settings (hidden under 480px) */}
             <button
                type="button"
                className="hidden xs:inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border opacity-80 hover:opacity-100"
@@ -184,7 +205,6 @@ export default function Header() {
             >
                <Settings className="h-5 w-5" />
             </button>
-
 
             {/* Avatar */}
             <button
@@ -195,7 +215,6 @@ export default function Header() {
                A
             </button>
          </div>
-
 
          {/* Mobile nav (drawer) */}
          {mobileOpen && (
@@ -278,7 +297,7 @@ export default function Header() {
             </Portal>
          )}
 
-
+         {/* Search modal */}
          {searchOpen && (
             <Portal>
                <div className="lg:hidden">
