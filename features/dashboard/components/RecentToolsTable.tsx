@@ -6,6 +6,17 @@ import { useRecentTools } from "../queries";
 import { Calendar } from "lucide-react";
 import { ErrorState } from "@/components/ui/ErrorState";
 
+type RecentToolRow = {
+   id: string | number;
+   name: string;
+   icon_url?: string | null;
+   owner_department: string;
+   active_users_count: number;
+   monthly_cost: number;
+   status: "active" | "expiring" | "unused";
+};
+
+
 export default function RecentToolsTable() {
    const { data, isLoading, isError, refetch } = useRecentTools();
 
@@ -50,7 +61,7 @@ export default function RecentToolsTable() {
                   </TR>
                </THead>
                <tbody>
-                  {data.map((tool: any) => (
+                  {data.map((tool: RecentToolRow) => (
                      <TR key={tool.id}>
                         <TD>
                            <div className="flex items-center gap-3">
