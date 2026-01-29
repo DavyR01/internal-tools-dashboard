@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -16,6 +16,7 @@ import {
 } from "../queries";
 import ToolViewModal from "./ToolViewModal";
 import ToolEditModal from "./ToolEditModal";
+import { useSearchParams } from "next/navigation";
 
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
@@ -91,23 +92,13 @@ export default function ToolsCatalog() {
       setModal({ mode: "edit", tool });
    }
 
-   function onSaveEdit() {
-      if (!modal || modal.mode !== "edit") return;
+   const searchParams = useSearchParams();
 
-      const patch: Partial<Pick<Tool, "monthly_cost" | "status" | "name">> = {
-         status: editStatus,
-      };
-
-      if (editMonthlyCost !== "") patch.monthly_cost = editMonthlyCost;
-      if (editName.trim()) patch.name = editName.trim();
-
-      updateTool.mutate(
-         { id: modal.tool.id, patch },
-         {
-            onSuccess: () => closeModal(),
-         }
-      );
-   }
+   useEffect(() => {
+      const urlQ = searchParams.get("q") ?? "";
+      setQ(urlQ);
+      setPage(1);
+   }, [searchParams]);
 
    return (
       <Card>

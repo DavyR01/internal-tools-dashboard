@@ -2,18 +2,29 @@
 
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 type SearchModalProps = {
    open: boolean;
    onClose: () => void;
+   initialValue?: string;
+   onSubmit: (query: string) => void;
 };
+
 
 function Portal({ children }: { children: React.ReactNode }) {
    if (typeof window === "undefined") return null;
    return createPortal(children, document.body);
 }
 
-export default function SearchModal({ open, onClose }: SearchModalProps) {
+export default function SearchModal({ open, onClose, initialValue = "", onSubmit }: SearchModalProps) {
+   const [value, setValue] = useState(initialValue);
+
+   useEffect(() => {
+      if (open) setValue(initialValue);
+   }, [open, initialValue]);
+
+   if (!open) return null;
    if (!open) return null;
 
    return (
@@ -58,6 +69,13 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                      id="modal-search"
                      aria-label="Search tools"
                      autoFocus
+                     value={value}
+                     onChange={(e) => setValue(e.target.value)}
+                     onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                           onSubmit(value);
+                        }
+                     }}
                      className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                      placeholder="Search Tools..."
                   />

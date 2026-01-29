@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Bell, Menu, Search, Sun, Moon, X, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -28,6 +28,10 @@ function Portal({ children }: { children: React.ReactNode }) {
 
 export default function Header() {
    const pathname = usePathname();
+   const router = useRouter();
+   const searchParams = useSearchParams();
+
+   const [query, setQuery] = useState("");
 
    const [dark, setDark] = useState(false);
    const [hydrated, setHydrated] = useState(false);
@@ -54,6 +58,13 @@ export default function Header() {
       setMobileOpen(false);
       setSearchOpen(false);
    }, [pathname]);
+
+   useEffect(() => {
+      // Pre-fills the search when you are on /tools?q=...
+      if (pathname !== "/tools") return;
+      const q = searchParams.get("q") ?? "";
+      setQuery(q);
+   }, [pathname, searchParams]);
 
    // Shared ESC + body scroll lock for any overlay
    useEffect(() => {
@@ -83,6 +94,14 @@ export default function Header() {
          body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
+
+   function submitSearch(raw?: string) {
+      const q = (raw ?? query).trim();
+      const href = q ? `/tools?q=${encodeURIComponent(q)}` : "/tools";
+      router.push(href);
+      setSearchOpen(false);
+   }
+
 
    return (
       <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
@@ -153,6 +172,11 @@ export default function Header() {
                <input
                   id="header-search"
                   aria-label="Search tools"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") submitSearch();
+                  }}
                   className="h-10 w-full rounded-xl border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                   placeholder="Search Tools..."
                />
@@ -221,7 +245,12 @@ export default function Header() {
          />
 
          {/* Search modal */}
-         <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+         <SearchModal
+            open={searchOpen}
+            onClose={() => setSearchOpen(false)}
+            initialValue={query}
+            onSubmit={(q) => submitSearch(q)}
+         />
       </header>
    );
 }
