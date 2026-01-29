@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -18,7 +17,7 @@ import {
    type SortOrder,
 } from "../queries";
 
-//  Debounce hook (correct: uses useEffect, not useMemo).
+// Debounce hook (correct: uses useEffect, not useMemo).
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
 
@@ -43,10 +42,11 @@ function parseStatus(value: string): ToolStatus | "all" {
    return "all";
 }
 
-export default function ToolsCatalog() {
-   const searchParams = useSearchParams();
-   const urlQ = searchParams.get("q") ?? "";
+type ToolsCatalogProps = {
+   initialQuery: string;
+};
 
+export default function ToolsCatalog({ initialQuery }: ToolsCatalogProps) {
    // Pagination & filters (local UI state)
    const [page, setPage] = useState(1);
    const limit = 10;
@@ -56,8 +56,9 @@ export default function ToolsCatalog() {
    const [sortBy, setSortBy] = useState<ToolsSortBy>("updated_at");
    const [order, setOrder] = useState<SortOrder>("desc");
 
-   // Search input state:
-   const [q, setQ] = useState(urlQ);
+   // Search input state (source of truth for the catalog search)
+   // This is initialized from the URL via ToolsPage remount key (no effect needed).
+   const [q, setQ] = useState(initialQuery);
    const debouncedQ = useDebouncedValue(q, 300);
 
    // When user types / changes filters, we reset the page
@@ -120,8 +121,7 @@ export default function ToolsCatalog() {
             {/* Filters row */}
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  {/* Search: key={urlQ} ensures UI picks up global header search without an effect */}
-                  <div className="space-y-1" key={urlQ}>
+                  <div className="space-y-1">
                      <div className="text-xs text-muted">Search</div>
                      <Input
                         value={q}
@@ -195,8 +195,6 @@ export default function ToolsCatalog() {
                   <Button
                      variant="secondary"
                      onClick={() => {
-                        // Reset local UI state; URL q remains
-                        // header search still deep-links via /tools?q=...
                         setQ("");
                         setStatus("all");
                         setDepartment("all");

@@ -6,7 +6,6 @@ import { Bell, Menu, Search, Sun, Moon, Settings } from "lucide-react";
 import {
    useCallback,
    useEffect,
-   useMemo,
    useState,
    useSyncExternalStore,
 } from "react";
@@ -280,10 +279,8 @@ export default function Header() {
       pathname === "/tools" ? searchParams.get("q") ?? "" : "";
 
    // Remount header on navigation and querystring updates to avoid setState in effects.
-   const headerKey = useMemo(
-      () => `${pathname}?${searchParams.toString()}`,
-      [pathname, searchParams]
-   );
+   const qParam = pathname === "/tools" ? searchParams.get("q") ?? "" : "";
+   const headerKey = `${pathname}?q=${qParam}`;
 
    return (
       <HeaderInner

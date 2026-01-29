@@ -1,7 +1,13 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import ToolsCatalog from "@/features/tools/components/ToolsCatalog";
 
 export default function ToolsPage() {
+   const searchParams = useSearchParams();
+   const q = searchParams.get("q") ?? "";
+
    return (
       <PageShell>
          <div className="space-y-6">
@@ -11,7 +17,9 @@ export default function ToolsPage() {
                   Browse and manage your organization’s internal SaaS tools.
                </p>
             </div>
-            <ToolsCatalog />
+
+            {/* Remount only when q changes to keep UI in sync with URL without setState in effects */}
+            <ToolsCatalog key={`q=${q}`} initialQuery={q} />
          </div>
       </PageShell>
    );
