@@ -1,9 +1,7 @@
 "use client";
 
-import { createPortal } from "react-dom";
-import { Search, X } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils/cn";
+import * as React from "react";
+import { X, Search } from "lucide-react";
 
 type SearchModalProps = {
    open: boolean;
@@ -18,79 +16,100 @@ export default function SearchModal({
    initialValue = "",
    onSubmit,
 }: SearchModalProps) {
-   // Do not mount anything when closed.
-   // This also avoids hydration mismatch because SSR renders null and the closed client render is null too.
-   if (!open) return null;
+   const inputRef = React.useRef<HTMLInputElement | null>(null);
+   const [value, setValue] = React.useState(initialValue);
 
-   // Safe in Client Components; keeps portal compatible with tests/SSR boundaries.
-   if (typeof document === "undefined") return null;
+   // Keep input in sync when modal is reopened with a new initialValue
+   React.useEffect(() => {
+      if (!open) return;
+      setValue(initialValue);
+   }, [open, initialValue]);
 
-   return createPortal(<SearchModalContent onClose={onClose} initialValue={initialValue} onSubmit={onSubmit} />, document.body);
-}
+   // Focus input when opening (no setState involved)
+   React.useEffect(() => {
+      if (!open) return;
+      requestAnimationFrame(() => inputRef.current?.focus());
+   }, [open]);
 
-function SearchModalContent({
-   onClose,
-   initialValue,
-   onSubmit,
-}: {
-   onClose: () => void;
-   initialValue: string;
-   onSubmit: (query: string) => void;
-}) {
-   // Initialize once on mount (the component is mounted only when open=true).
-   const [value, setValue] = useState(() => initialValue);
+   const handleSubmit = () => {
+      onSubmit(value.trim());
+   };
 
    return (
-      <div className="lg:hidden" aria-hidden={false}>
+      <div
+         // Always mounted: smooth open/close with CSS only
+         className={[
+            "fixed inset-0 z-200 lg:hidden", // keep consistent with your overlay layering
+            "transition-opacity duration-200 ease-out",
+            open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+         ].join(" ")}
+         aria-hidden={!open}
+         onClick={onClose}
+      >
          {/* Backdrop */}
-         <div
-            className="fixed inset-0 z-100 bg-black/50 opacity-100 transition-opacity duration-200"
-            aria-hidden="true"
-            onClick={onClose}
-         />
+         <div className="absolute inset-0 bg-black/40" />
 
-         {/* Modal */}
+         {/* Panel */}
          <div
-            id="search-modal"
             role="dialog"
             aria-modal="true"
-            className={cn(
-               "fixed left-1/2 top-24 z-110 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg",
-               "opacity-100 scale-100 transition duration-200 ease-out will-change-transform will-change-opacity"
-            )}
+            aria-label="Search"
+            className={[
+               "absolute left-1/2 top-16 w-[92%] max-w-lg -translate-x-1/2",
+               "rounded-2xl border border-border bg-surface shadow-xl",
+               "transition-all duration-200 ease-out",
+               open ? "translate-y-0 scale-100 opacity-100" : "-translate-y-2 scale-[0.98] opacity-0",
+            ].join(" ")}
             onClick={(e) => e.stopPropagation()}
          >
-            <div className="flex items-center gap-2">
-               <div className="text-sm font-semibold">Search</div>
-               <div className="flex-1" />
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+               <div className="text-sm font-medium">Search tools</div>
                <button
                   type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
-                  aria-label="Close search"
                   onClick={onClose}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                  aria-label="Close"
                >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                </button>
             </div>
 
-            <div className="relative mt-3">
-               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
-
-               <label htmlFor="modal-search" className="sr-only">
+            <div className="p-4">
+               <label htmlFor="mobile-search" className="sr-only">
                   Search tools
                </label>
-               <input
-                  id="modal-search"
-                  aria-label="Search tools"
-                  autoFocus
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  onKeyDown={(e) => {
-                     if (e.key === "Enter") onSubmit(value);
-                  }}
-                  className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
-                  placeholder="Search Tools..."
-               />
+
+               <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-60" />
+                  <input
+                     ref={inputRef}
+                     id="mobile-search"
+                     value={value}
+                     onChange={(e) => setValue(e.target.value)}
+                     onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSubmit();
+                     }}
+                     className="h-11 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
+                     placeholder="Search Tools..."
+                  />
+               </div>
+
+               <div className="mt-3 flex justify-end gap-2">
+                  <button
+                     type="button"
+                     onClick={onClose}
+                     className="h-10 rounded-xl border border-border px-4 text-sm transition-colors duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                  >
+                     Cancel
+                  </button>
+                  <button
+                     type="button"
+                     onClick={handleSubmit}
+                     className="h-10 rounded-xl bg-purple-600 px-4 text-sm font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+                  >
+                     Search
+                  </button>
+               </div>
             </div>
          </div>
       </div>

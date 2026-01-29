@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Bell, Menu, Search, Sun, Moon, Settings } from "lucide-react";
 import {
+   Suspense,
    useCallback,
    useEffect,
    useRef,
@@ -298,14 +299,13 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
    );
 }
 
-export default function Header() {
-   const pathname = usePathname();
+
+//  This component is the ONLY place where we call useSearchParams().
+//  It must be rendered under a Suspense boundary to satisfy Next's CSR bailout requirement.
+
+function HeaderSearchParamsBridge({ pathname }: { pathname: string }) {
    const searchParams = useSearchParams();
 
-   const initialQuery =
-      pathname === "/tools" ? searchParams.get("q") ?? "" : "";
-
-   // Remount header on navigation and querystring updates to avoid setState in effects.
    const qParam = pathname === "/tools" ? searchParams.get("q") ?? "" : "";
    const headerKey = `${pathname}?q=${qParam}`;
 
@@ -313,7 +313,18 @@ export default function Header() {
       <HeaderInner
          key={headerKey}
          pathname={pathname}
-         initialQuery={initialQuery}
+         initialQuery={qParam}
       />
+   );
+}
+
+export default function Header() {
+   const pathname = usePathname();
+
+   // Fallback renders a stable header (same height), preventing visible layout shift.
+   return (
+      <Suspense fallback={<HeaderInner pathname={pathname} initialQuery="" />}>
+         <HeaderSearchParamsBridge pathname={pathname} />
+      </Suspense>
    );
 }
