@@ -21,7 +21,7 @@ type RecentToolRow = {
 
 export default function RecentToolsTable() {
    const { data, isLoading, isError, refetch } = useRecentTools();
-   const [imgError, setImgError] = useState(false);
+   const [imgErrorById, setImgErrorById] = useState<Record<string | number, boolean>>({});
 
    if (isLoading) {
       return <div className="h-48 animate-pulse rounded-2xl bg-surface" />;
@@ -65,19 +65,21 @@ export default function RecentToolsTable() {
                </THead>
                <tbody>
                   {data.map((tool: RecentToolRow) => {
+                     const hasImgError = !!imgErrorById[tool.id];
+
                      return (
                         <TR key={tool.id}>
                            <TD>
                               <div className="flex items-center gap-3">
                                  <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-elevated">
-                                    {tool.icon_url && !imgError ? (
+                                    {tool.icon_url && !hasImgError ? (
                                        <Image
                                           src={tool.icon_url}
                                           alt={tool.name}
                                           fill
                                           unoptimized
                                           className="object-contain p-1"
-                                          onError={() => setImgError(true)}
+                                          onError={() => setImgErrorById((prev) => ({ ...prev, [tool.id]: true }))}
                                        />
                                     ) : (
                                        <span className="text-xs font-semibold text-muted">
