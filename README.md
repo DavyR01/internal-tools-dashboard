@@ -197,6 +197,9 @@ Choix clés :
 
 Ces choix garantissent une visualisation fiable, lisible et défendable dans un contexte d’outil interne professionnel.
 
+Un export **CSV** est disponible depuis la page Analytics afin de permettre aux équipes IT / Finance
+d’exploiter les données de coûts et d’usage dans leurs outils de reporting.
+
 ---
 
 ## 🔮 Next Steps / Complete App Vision
