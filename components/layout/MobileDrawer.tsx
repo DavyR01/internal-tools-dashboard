@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
+import { useState } from "react";
 
 type NavItem = {
    label: string;
@@ -15,6 +16,7 @@ type MobileDrawerProps = {
    onClose: () => void;
    pathname: string;
    navItems: NavItem[];
+   onSearch: (q: string) => void
 };
 
 function Portal({ children }: { children: React.ReactNode }) {
@@ -27,7 +29,10 @@ export default function MobileDrawer({
    onClose,
    pathname,
    navItems,
+   onSearch
 }: MobileDrawerProps) {
+   const [query, setQuery] = useState("");
+
    if (!open) return null;
 
    return (
@@ -73,6 +78,13 @@ export default function MobileDrawer({
                   <input
                      id="drawer-search"
                      aria-label="Search tools"
+                     value={query}
+                     onChange={(e) => setQuery(e.target.value)}
+                     onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        onSearch(query);
+                        onClose();
+                     }}
                      className="h-10 w-full rounded-xl border border-border bg-transparent pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/40"
                      placeholder="Search Tools..."
                   />

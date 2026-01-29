@@ -284,6 +284,7 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
             onClose={closeOverlays}
             pathname={pathname}
             navItems={navItems}
+            onSearch={(q) => submitSearch(q)}
          />
 
          {/* Search modal */}
