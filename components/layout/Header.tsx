@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Bell, Menu, Search, Sun, Moon, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+   useSyncExternalStore,
+} from "react";
 import MobileDrawer from "@/components/layout/MobileDrawer";
 import SearchModal from "@/components/layout/SearchModal";
 
@@ -20,13 +26,25 @@ function cx(...classes: Array<string | false | undefined>) {
    return classes.filter(Boolean).join(" ");
 }
 
-export default function Header() {
-   const pathname = usePathname();
-   const router = useRouter();
-   const searchParams = useSearchParams();
+// This avoids hydration warnings and keeps strict lint happy.
+function useIsClient(): boolean {
+   return useSyncExternalStore(
+      () => () => {
+      },
+      () => true,
+      () => false
+   );
+}
 
-   const [query, setQuery] = useState("");
-   const [hydrated, setHydrated] = useState(false);
+type HeaderInnerProps = {
+   pathname: string;
+   initialQuery: string;
+};
+
+function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
+   const router = useRouter();
+
+   const isClient = useIsClient();
 
    const [dark, setDark] = useState<boolean>(() => {
       if (typeof window === "undefined") return false;
@@ -35,6 +53,13 @@ export default function Header() {
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
+
+   const [query, setQuery] = useState(initialQuery);
+
+   const closeOverlays = useCallback(() => {
+      setMobileOpen(false);
+      setSearchOpen(false);
+   }, []);
 
    function toggleTheme() {
       setDark((prev) => {
@@ -48,35 +73,20 @@ export default function Header() {
       });
    }
 
-   // Apply + persist theme
+   // Apply + persist theme (external side-effects only)
    useEffect(() => {
       document.documentElement.classList.toggle("dark", dark);
       localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
    }, [dark]);
-
-   // Close overlays on route change
-   useEffect(() => {
-      setMobileOpen(false);
-      setSearchOpen(false);
-   }, [pathname]);
-
-   useEffect(() => {
-      // Pre-fills the search when you are on /tools?q=...
-      if (pathname !== "/tools") return;
-      const q = searchParams.get("q") ?? "";
-      setQuery(q);
-   }, [pathname, searchParams]);
 
    // Shared ESC + body scroll lock for any overlay
    useEffect(() => {
       if (!mobileOpen && !searchOpen) return;
 
       const onKeyDown = (e: KeyboardEvent) => {
-         if (e.key === "Escape") {
-            setMobileOpen(false);
-            setSearchOpen(false);
-         }
+         if (e.key === "Escape") closeOverlays();
       };
+
       document.addEventListener("keydown", onKeyDown);
 
       const body = document.body;
@@ -94,12 +104,7 @@ export default function Header() {
          body.style.overflow = prevOverflow;
          body.style.paddingRight = prevPaddingRight;
       };
-   }, [mobileOpen, searchOpen]);
-
-   useEffect(() => {
-      const id = requestAnimationFrame(() => setHydrated(true));
-      return () => cancelAnimationFrame(id);
-   }, []);
+   }, [mobileOpen, searchOpen, closeOverlays]);
 
    function submitSearch(raw?: string) {
       const q = (raw ?? query).trim();
@@ -107,7 +112,6 @@ export default function Header() {
       router.push(href);
       setSearchOpen(false);
    }
-
 
    return (
       <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
@@ -201,7 +205,7 @@ export default function Header() {
             </button>
 
             {/* Theme */}
-            {hydrated ? (
+            {isClient ? (
                <button
                   type="button"
                   onClick={toggleTheme}
@@ -211,7 +215,10 @@ export default function Header() {
                   {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                </button>
             ) : (
-               <div className="h-9 w-9 rounded-xl border border-border bg-surface" aria-hidden />
+               <div
+                  className="h-9 w-9 rounded-xl border border-border bg-surface"
+                  aria-hidden
+               />
             )}
 
             {/* Notifications */}
@@ -249,7 +256,7 @@ export default function Header() {
          {/* Mobile nav (drawer) */}
          <MobileDrawer
             open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
+            onClose={closeOverlays}
             pathname={pathname}
             navItems={navItems}
          />
@@ -257,10 +264,32 @@ export default function Header() {
          {/* Search modal */}
          <SearchModal
             open={searchOpen}
-            onClose={() => setSearchOpen(false)}
+            onClose={closeOverlays}
             initialValue={query}
             onSubmit={(q) => submitSearch(q)}
          />
-      </header >
+      </header>
+   );
+}
+
+export default function Header() {
+   const pathname = usePathname();
+   const searchParams = useSearchParams();
+
+   const initialQuery =
+      pathname === "/tools" ? searchParams.get("q") ?? "" : "";
+
+   // Remount header on navigation and querystring updates to avoid setState in effects.
+   const headerKey = useMemo(
+      () => `${pathname}?${searchParams.toString()}`,
+      [pathname, searchParams]
+   );
+
+   return (
+      <HeaderInner
+         key={headerKey}
+         pathname={pathname}
+         initialQuery={initialQuery}
+      />
    );
 }
