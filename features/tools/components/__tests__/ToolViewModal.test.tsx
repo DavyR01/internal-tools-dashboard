@@ -1,18 +1,9 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ToolViewModal from "../ToolViewModal";
+import { makeTool } from "../../test-utils/fixtures";
 
-const tool = {
-   id: 1,
-   name: "Slack",
-   vendor: "Salesforce",
-   category: "Communication",
-   status: "active",
-   monthly_cost: 1200,
-   active_users_count: 42,
-   website_url: "https://slack.com",
-   description: "Team chat",
-} as any;
+const tool = makeTool();
 
 describe("ToolViewModal", () => {
    test("renders tool details and closes on button click", async () => {

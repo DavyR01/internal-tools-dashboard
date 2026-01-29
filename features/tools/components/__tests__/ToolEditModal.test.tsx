@@ -1,13 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ToolEditModal from "../ToolEditModal";
+import { makeTool } from "../../test-utils/fixtures";
 
-const tool = {
-   id: 1,
-   name: "Slack",
-   monthly_cost: 1200,
-   status: "active",
-} as any; // on garde volontairement minimal : le composant n'utilise que ces champs
+const tool = makeTool();
 
 describe("ToolEditModal", () => {
    test("prefills fields from tool and calls onSave with a valid patch", async () => {

@@ -71,9 +71,9 @@ export default function ToolsCatalog() {
 
    // ---- Edit form state (minimal) ----
    const updateTool = useUpdateTool();
-   const [editMonthlyCost, setEditMonthlyCost] = useState<number | "">("");
-   const [editStatus, setEditStatus] = useState<ToolStatus>("active");
-   const [editName, setEditName] = useState("");
+   const [, setEditMonthlyCost] = useState<number | "">("");
+   const [, setEditStatus] = useState<ToolStatus>("active");
+   const [, setEditName] = useState("");
 
    function openView(tool: Tool) {
       setModal({ mode: "view", tool });
