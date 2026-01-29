@@ -13,7 +13,13 @@ type SearchModalProps = {
 };
 
 function Portal({ children }: { children: React.ReactNode }) {
-   if (typeof window === "undefined") return null;
+   const [mounted, setMounted] = useState(false);
+
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   if (!mounted) return null;
    return createPortal(children, document.body);
 }
 

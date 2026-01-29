@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 
 type NavItem = {
@@ -21,7 +21,13 @@ type MobileDrawerProps = {
 };
 
 function Portal({ children }: { children: React.ReactNode }) {
-   if (typeof window === "undefined") return null;
+   const [mounted, setMounted] = useState(false);
+
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   if (!mounted) return null;
    return createPortal(children, document.body);
 }
 
