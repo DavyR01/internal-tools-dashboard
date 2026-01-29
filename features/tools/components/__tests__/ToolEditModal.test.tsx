@@ -28,11 +28,15 @@ describe("ToolEditModal", () => {
 
       // Prefill
       const nameInput = screen.getByRole("textbox");
-      const costInput = screen.getByRole("spinbutton");
+      const costInput = screen.getByLabelText(/monthly cost/i);
+      const usersInput = screen.getByLabelText(/users/i);
       const statusSelect = screen.getByRole("combobox");
 
       expect(nameInput).toHaveValue("Slack");
       expect(costInput).toHaveValue(1200);
+      // Fixture-dependent: if your makeTool() sets users to a number, assert it.
+      // Slack fixture usually has users = 205 in your UI screenshot context.
+      expect(usersInput).toHaveValue(tool.active_users_count ?? 0);
       expect(statusSelect).toHaveValue("active");
 
       // Update values
@@ -42,6 +46,9 @@ describe("ToolEditModal", () => {
       await user.clear(costInput);
       await user.type(costInput, "999");
 
+      await user.clear(usersInput);
+      await user.type(usersInput, "42");
+
       await user.selectOptions(statusSelect, "unused");
 
       await user.click(screen.getByRole("button", { name: /^save$/i }));
@@ -50,6 +57,7 @@ describe("ToolEditModal", () => {
       expect(onSave).toHaveBeenCalledWith({
          name: "Notion",
          monthly_cost: 999,
+         active_users_count: 42,
          status: "unused",
       });
    });

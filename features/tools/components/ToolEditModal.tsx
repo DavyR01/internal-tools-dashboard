@@ -1,10 +1,13 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { Tool, ToolStatus } from "../queries";
+
+type ToolPatch = Partial<Pick<Tool, "name" | "monthly_cost" | "status" | "active_users_count">>;
 
 export default function ToolEditModal({
    open,
@@ -17,40 +20,54 @@ export default function ToolEditModal({
    open: boolean;
    tool: Tool | null;
    onClose: () => void;
-   onSave: (patch: Partial<Pick<Tool, "name" | "monthly_cost" | "status" | "active_users_count">>) => void;
+   onSave: (patch: ToolPatch) => void;
    isSaving: boolean;
    isError: boolean;
 }) {
    // Important: if the modal is closed or tool is missing, do not mount it.
+   if (!open || !tool) return null;
 
    // Initialize form state from the current tool *on mount*.
-   const [name, setName] = useState(() => tool?.name ?? "");
+   const [name, setName] = useState(() => tool.name ?? "");
    const [monthlyCost, setMonthlyCost] = useState<number | "">(() =>
-      typeof tool?.monthly_cost === "number" ? tool?.monthly_cost : ""
+      typeof tool.monthly_cost === "number" ? tool.monthly_cost : ""
    );
    const [users, setUsers] = useState<number | "">(() =>
-      typeof tool?.active_users_count === "number" ? tool.active_users_count : ""
+      typeof tool.active_users_count === "number" ? tool.active_users_count : ""
    );
-   const [status, setStatus] = useState<ToolStatus>(() => tool?.status ?? "active");
+   const [status, setStatus] = useState<ToolStatus>(() => tool.status ?? "active");
 
-   // Lightweight "dirty" detection if you later want to disable Save unless changes.
    const canSave = useMemo(() => !isSaving, [isSaving]);
 
-   if (!open || !tool) return null;
+   const nameId = "tool-edit-name";
+   const monthlyCostId = "tool-edit-monthly-cost";
+   const usersId = "tool-edit-users";
+   const statusId = "tool-edit-status";
 
    return (
       <Modal open title="Edit tool" onClose={onClose}>
          <div className="space-y-4">
             <div className="space-y-1">
-               <div className="text-xs text-muted">Name</div>
-               <Input className="border-muted/40" value={name} onChange={(e) => setName(e.target.value)} />
+               <label className="text-xs text-muted" htmlFor={nameId}>
+                  Name
+               </label>
+               <Input
+                  id={nameId}
+                  className="border-muted/40"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+               />
             </div>
 
             <div className="space-y-1">
-               <div className="text-xs text-muted">Monthly cost (€)</div>
+               <label className="text-xs text-muted" htmlFor={monthlyCostId}>
+                  Monthly cost (€)
+               </label>
                <input
+                  id={monthlyCostId}
                   className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
+                  inputMode="numeric"
                   value={monthlyCost}
                   onChange={(e) =>
                      setMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
@@ -59,10 +76,14 @@ export default function ToolEditModal({
             </div>
 
             <div className="space-y-1">
-               <div className="text-xs text-muted">Users</div>
+               <label className="text-xs text-muted" htmlFor={usersId}>
+                  Users
+               </label>
                <input
+                  id={usersId}
                   className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
+                  inputMode="numeric"
                   min={0}
                   value={users}
                   onChange={(e) => setUsers(e.target.value === "" ? "" : Number(e.target.value))}
@@ -70,8 +91,11 @@ export default function ToolEditModal({
             </div>
 
             <div className="space-y-1">
-               <div className="text-xs text-muted">Status</div>
+               <label className="text-xs text-muted" htmlFor={statusId}>
+                  Status
+               </label>
                <select
+                  id={statusId}
                   className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ToolStatus)}
@@ -93,6 +117,7 @@ export default function ToolEditModal({
                <Button variant="secondary" onClick={onClose} disabled={isSaving}>
                   Cancel
                </Button>
+
                <Button
                   onClick={() =>
                      onSave({
