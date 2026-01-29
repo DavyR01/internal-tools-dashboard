@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Bell, Menu, Search, Sun, Moon, X, Settings } from "lucide-react";
+import { Bell, Menu, Search, Sun, Moon, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import MobileDrawer from "@/components/layout/MobileDrawer";
 import SearchModal from "@/components/layout/SearchModal";
 
@@ -21,37 +20,39 @@ function cx(...classes: Array<string | false | undefined>) {
    return classes.filter(Boolean).join(" ");
 }
 
-function Portal({ children }: { children: React.ReactNode }) {
-   if (typeof window === "undefined") return null;
-   return createPortal(children, document.body);
-}
-
 export default function Header() {
    const pathname = usePathname();
    const router = useRouter();
    const searchParams = useSearchParams();
 
    const [query, setQuery] = useState("");
-
-   const [dark, setDark] = useState(false);
    const [hydrated, setHydrated] = useState(false);
+
+   const [dark, setDark] = useState<boolean>(() => {
+      if (typeof window === "undefined") return false;
+      return document.documentElement.classList.contains("dark");
+   });
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
 
-   // Load persisted theme (do not write before hydration)
-   useEffect(() => {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      setDark(saved === "dark");
-      setHydrated(true);
-   }, []);
+   function toggleTheme() {
+      setDark((prev) => {
+         const next = !prev;
+
+         const root = document.documentElement;
+         root.classList.toggle("dark", next);
+         localStorage.setItem(THEME_STORAGE_KEY, next ? "dark" : "light");
+
+         return next;
+      });
+   }
 
    // Apply + persist theme
    useEffect(() => {
-      if (!hydrated) return;
       document.documentElement.classList.toggle("dark", dark);
       localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
-   }, [dark, hydrated]);
+   }, [dark]);
 
    // Close overlays on route change
    useEffect(() => {
@@ -94,6 +95,11 @@ export default function Header() {
          body.style.paddingRight = prevPaddingRight;
       };
    }, [mobileOpen, searchOpen]);
+
+   useEffect(() => {
+      const id = requestAnimationFrame(() => setHydrated(true));
+      return () => cancelAnimationFrame(id);
+   }, []);
 
    function submitSearch(raw?: string) {
       const q = (raw ?? query).trim();
@@ -195,14 +201,18 @@ export default function Header() {
             </button>
 
             {/* Theme */}
-            <button
-               type="button"
-               onClick={() => setDark((v) => !v)}
-               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
-               aria-label="Toggle theme"
-            >
-               {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
+            {hydrated ? (
+               <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border"
+                  aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+               >
+                  {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+               </button>
+            ) : (
+               <div className="h-9 w-9 rounded-xl border border-border bg-surface" aria-hidden />
+            )}
 
             {/* Notifications */}
             <button
@@ -251,6 +261,6 @@ export default function Header() {
             initialValue={query}
             onSubmit={(q) => submitSearch(q)}
          />
-      </header>
+      </header >
    );
 }
