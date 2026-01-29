@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -21,19 +21,18 @@ export default function ToolEditModal({
    isSaving: boolean;
    isError: boolean;
 }) {
-   const [name, setName] = useState("");
-   const [monthlyCost, setMonthlyCost] = useState<number | "">("");
-   const [status, setStatus] = useState<ToolStatus>("active");
-
-   // init form when tool changes / modal opens
-   useEffect(() => {
-      if (!open || !tool) return;
-      setName(tool.name ?? "");
-      setMonthlyCost(typeof tool.monthly_cost === "number" ? tool.monthly_cost : "");
-      setStatus(tool.status);
-   }, [open, tool]);
-
+   // Important: if the modal is closed or tool is missing, do not mount it.
    if (!open || !tool) return null;
+
+   // Initialize form state from the current tool *on mount*.
+   const [name, setName] = useState(() => tool.name ?? "");
+   const [monthlyCost, setMonthlyCost] = useState<number | "">(() =>
+      typeof tool.monthly_cost === "number" ? tool.monthly_cost : ""
+   );
+   const [status, setStatus] = useState<ToolStatus>(() => tool.status);
+
+   // Lightweight "dirty" detection if you later want to disable Save unless changes.
+   const canSave = useMemo(() => !isSaving, [isSaving]);
 
    return (
       <Modal open title="Edit tool" onClose={onClose}>
@@ -49,7 +48,9 @@ export default function ToolEditModal({
                   className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
                   value={monthlyCost}
-                  onChange={(e) => setMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))}
+                  onChange={(e) =>
+                     setMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
+                  }
                />
             </div>
 
@@ -85,7 +86,7 @@ export default function ToolEditModal({
                         status,
                      })
                   }
-                  disabled={isSaving}
+                  disabled={!canSave}
                >
                   {isSaving ? "Saving…" : "Save"}
                </Button>

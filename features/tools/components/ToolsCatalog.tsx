@@ -17,7 +17,7 @@ import {
    type SortOrder,
 } from "../queries";
 
-// Debounce hook (correct: uses useEffect, not useMemo).
+// Debounce hook
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
 
@@ -261,19 +261,18 @@ export default function ToolsCatalog({ initialQuery }: ToolsCatalogProps) {
 
             {modal?.mode === "edit" ? (
                <ToolEditModal
+                  key={modal.tool.id}
                   open
                   tool={modal.tool}
                   onClose={closeModal}
                   isSaving={updateTool.isPending}
                   isError={updateTool.isError}
                   onSave={(patch) => {
-                     updateTool.mutate(
-                        { id: modal.tool.id, patch },
-                        { onSuccess: closeModal }
-                     );
+                     updateTool.mutate({ id: modal.tool.id, patch }, { onSuccess: closeModal });
                   }}
                />
             ) : null}
+
          </CardContent>
       </Card>
    );
