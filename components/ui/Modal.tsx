@@ -19,7 +19,7 @@ export function Modal({
    return (
       <div className="fixed inset-0 z-[50]">
          {/* backdrop (visual only) */}
-         <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+         <div className="absolute inset-0 bg-black/70" aria-hidden="true" />
 
          {/* click-catcher */}
          <div

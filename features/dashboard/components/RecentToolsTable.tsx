@@ -52,7 +52,7 @@ export default function RecentToolsTable() {
          </div>
 
          {/* Scroll container */}
-         <div className="min-w-185">
+         <div className="min-w-195">
             <Table className=" bg-surface">
                <THead>
                   <TR className="border-t-0">
