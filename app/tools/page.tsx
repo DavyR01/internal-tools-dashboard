@@ -1,26 +1,13 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import PageShell from "@/components/layout/PageShell";
-import ToolsCatalog from "@/features/tools/components/ToolsCatalog";
+import ToolsPageClient from "@/features/tools/components/ToolsPageClient";
 
 export default function ToolsPage() {
-   const searchParams = useSearchParams();
-   const q = searchParams.get("q") ?? "";
-
    return (
       <PageShell>
-         <div className="space-y-6">
-            <div>
-               <h1 className="text-2xl font-semibold">Tools catalog</h1>
-               <p className="mt-1 text-sm text-muted">
-                  Browse and manage your organization’s internal SaaS tools.
-               </p>
-            </div>
-
-            {/* Remount only when q changes to keep UI in sync with URL without setState in effects */}
-            <ToolsCatalog key={`q=${q}`} initialQuery={q} />
-         </div>
+         <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-surface" />}>
+            <ToolsPageClient />
+         </Suspense>
       </PageShell>
    );
 }
