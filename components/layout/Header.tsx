@@ -6,6 +6,7 @@ import { Bell, Menu, Search, Sun, Moon, Settings } from "lucide-react";
 import {
    useCallback,
    useEffect,
+   useRef,
    useState,
    useSyncExternalStore,
 } from "react";
@@ -105,12 +106,31 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
       };
    }, [mobileOpen, searchOpen, closeOverlays]);
 
+   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
    function submitSearch(raw?: string) {
       const q = (raw ?? query).trim();
       const href = q ? `/tools?q=${encodeURIComponent(q)}` : "/tools";
+
+      // Ask the next Header instance to restore focus
+      sessionStorage.setItem("headerSearchFocus", "1");
+
       router.push(href);
       setSearchOpen(false);
    }
+
+   useEffect(() => {
+      const shouldFocus = sessionStorage.getItem("headerSearchFocus") === "1";
+      if (!shouldFocus) return;
+
+      sessionStorage.removeItem("headerSearchFocus");
+
+      // Wait for DOM paint to ensure input exists
+      requestAnimationFrame(() => {
+         searchInputRef.current?.focus();
+      });
+   }, []);
+
 
    return (
       <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
@@ -179,6 +199,7 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
                   Search tools
                </label>
                <input
+                  ref={searchInputRef}
                   id="header-search"
                   aria-label="Search tools"
                   value={query}
