@@ -40,13 +40,13 @@ export default function ToolEditModal({
          <div className="space-y-4">
             <div className="space-y-1">
                <div className="text-xs text-muted">Name</div>
-               <Input value={name} onChange={(e) => setName(e.target.value)} />
+               <Input className="border-muted/40" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
 
             <div className="space-y-1">
                <div className="text-xs text-muted">Monthly cost (€)</div>
                <input
-                  className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                  className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
                   value={monthlyCost}
                   onChange={(e) =>
@@ -58,7 +58,7 @@ export default function ToolEditModal({
             <div className="space-y-1">
                <div className="text-xs text-muted">Status</div>
                <select
-                  className="h-10 w-full rounded-xl border border-border/20 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                  className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ToolStatus)}
                >
@@ -69,7 +69,7 @@ export default function ToolEditModal({
             </div>
 
             {isError ? (
-               <div className="rounded-xl border border-border/30 bg-elevated/50 p-3 text-sm">
+               <div className="rounded-xl border border-muted/40 bg-elevated/50 p-3 text-sm">
                   <div className="font-medium">Couldn’t save changes</div>
                   <div className="text-muted">Please retry.</div>
                </div>
