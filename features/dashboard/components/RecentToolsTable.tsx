@@ -89,7 +89,7 @@ export default function RecentToolsTable() {
                                  </div>
 
                                  <div className="min-w-0">
-                                    <div className="truncate font-medium" title={tool.name}>
+                                    <div className="max-w-[260px] truncate font-medium" title={tool.name}>
                                        {tool.name}
                                     </div>
                                  </div>
