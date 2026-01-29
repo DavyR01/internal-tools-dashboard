@@ -5,6 +5,8 @@ import { StatusBadge } from "@/components/ui/Badge";
 import { useRecentTools } from "../queries";
 import { Calendar } from "lucide-react";
 import { ErrorState } from "@/components/ui/ErrorState";
+import Image from "next/image";
+import { useState } from "react";
 
 type RecentToolRow = {
    id: string | number;
@@ -19,6 +21,7 @@ type RecentToolRow = {
 
 export default function RecentToolsTable() {
    const { data, isLoading, isError, refetch } = useRecentTools();
+   const [imgError, setImgError] = useState(false);
 
    if (isLoading) {
       return <div className="h-48 animate-pulse rounded-2xl bg-surface" />;
@@ -61,46 +64,44 @@ export default function RecentToolsTable() {
                   </TR>
                </THead>
                <tbody>
-                  {data.map((tool: RecentToolRow) => (
-                     <TR key={tool.id}>
-                        <TD>
-                           <div className="flex items-center gap-3">
-                              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-elevated">
-                                 {tool.icon_url ? (
-                                    <img
-                                       src={tool.icon_url}
-                                       alt={tool.name}
-                                       className="h-full w-full object-contain p-1"
-                                       loading="lazy"
-                                       onError={(e) => {
-                                          e.currentTarget.style.display = "none";
-                                          const parent = e.currentTarget.parentElement;
-                                          if (!parent) return;
-                                          parent.classList.add("text-xs", "font-semibold", "text-muted");
-                                          parent.textContent = tool.name?.charAt(0) ?? "—";
-                                       }} />
-                                 ) : (
-                                    <span className="text-xs font-semibold text-muted">
-                                       {tool.name?.charAt(0)}
-                                    </span>
-                                 )}
-                              </div>
+                  {data.map((tool: RecentToolRow) => {
+                     return (
+                        <TR key={tool.id}>
+                           <TD>
+                              <div className="flex items-center gap-3">
+                                 <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-elevated">
+                                    {tool.icon_url && !imgError ? (
+                                       <Image
+                                          src={tool.icon_url}
+                                          alt={tool.name}
+                                          fill
+                                          unoptimized
+                                          className="object-contain p-1"
+                                          onError={() => setImgError(true)}
+                                       />
+                                    ) : (
+                                       <span className="text-xs font-semibold text-muted">
+                                          {tool.name?.charAt(0) ?? "—"}
+                                       </span>
+                                    )}
+                                 </div>
 
-                              <div className="min-w-0">
-                                 <div className="truncate font-medium" title={tool.name}>
-                                    {tool.name}
+                                 <div className="min-w-0">
+                                    <div className="truncate font-medium" title={tool.name}>
+                                       {tool.name}
+                                    </div>
                                  </div>
                               </div>
-                           </div>
-                        </TD>
-                        <TD>{tool.owner_department}</TD>
-                        <TD>{tool.active_users_count}</TD>
-                        <TD className="text-left">€{tool.monthly_cost}</TD>
-                        <TD>
-                           <StatusBadge status={tool.status} />
-                        </TD>
-                     </TR>
-                  ))}
+                           </TD>
+                           <TD>{tool.owner_department}</TD>
+                           <TD>{tool.active_users_count}</TD>
+                           <TD className="text-left">€{tool.monthly_cost}</TD>
+                           <TD>
+                              <StatusBadge status={tool.status} />
+                           </TD>
+                        </TR>
+                     );
+                  })}
                </tbody>
             </Table>
          </div>
