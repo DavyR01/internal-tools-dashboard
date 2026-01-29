@@ -17,7 +17,7 @@ export default function ToolEditModal({
    open: boolean;
    tool: Tool | null;
    onClose: () => void;
-   onSave: (patch: Partial<Pick<Tool, "name" | "monthly_cost" | "status">>) => void;
+   onSave: (patch: Partial<Pick<Tool, "name" | "monthly_cost" | "status" | "active_users_count">>) => void;
    isSaving: boolean;
    isError: boolean;
 }) {
@@ -27,6 +27,9 @@ export default function ToolEditModal({
    const [name, setName] = useState(() => tool?.name ?? "");
    const [monthlyCost, setMonthlyCost] = useState<number | "">(() =>
       typeof tool?.monthly_cost === "number" ? tool?.monthly_cost : ""
+   );
+   const [users, setUsers] = useState<number | "">(() =>
+      typeof tool?.active_users_count === "number" ? tool.active_users_count : ""
    );
    const [status, setStatus] = useState<ToolStatus>(() => tool?.status ?? "active");
 
@@ -52,6 +55,17 @@ export default function ToolEditModal({
                   onChange={(e) =>
                      setMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
                   }
+               />
+            </div>
+
+            <div className="space-y-1">
+               <div className="text-xs text-muted">Users</div>
+               <input
+                  className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
+                  type="number"
+                  min={0}
+                  value={users}
+                  onChange={(e) => setUsers(e.target.value === "" ? "" : Number(e.target.value))}
                />
             </div>
 
@@ -84,6 +98,7 @@ export default function ToolEditModal({
                      onSave({
                         name: name.trim() || undefined,
                         monthly_cost: monthlyCost === "" ? undefined : monthlyCost,
+                        active_users_count: users === "" ? undefined : users,
                         status,
                      })
                   }
