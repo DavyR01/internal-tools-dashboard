@@ -7,7 +7,7 @@ import { Calendar } from "lucide-react";
 import { ErrorState } from "@/components/ui/ErrorState";
 
 export default function RecentToolsTable() {
-   const { data, isLoading, isError, error, refetch } = useRecentTools();
+   const { data, isLoading, isError, refetch } = useRecentTools();
 
    if (isLoading) {
       return <div className="h-48 animate-pulse rounded-2xl bg-surface" />;

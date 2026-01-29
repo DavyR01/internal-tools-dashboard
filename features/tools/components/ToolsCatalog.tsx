@@ -1,29 +1,30 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import ToolsTable from "./ToolsTable";
+import ToolViewModal from "./ToolViewModal";
+import ToolEditModal from "./ToolEditModal";
 import {
    useDepartments,
    useToolsList,
-   Tool,
-   ToolStatus,
-   ToolsSortBy,
-   SortOrder,
    useUpdateTool,
+   type Tool,
+   type ToolStatus,
+   type ToolsSortBy,
+   type SortOrder,
 } from "../queries";
-import ToolViewModal from "./ToolViewModal";
-import ToolEditModal from "./ToolEditModal";
-import { useSearchParams } from "next/navigation";
 
+//  Debounce hook (correct: uses useEffect, not useMemo).
 function useDebouncedValue<T>(value: T, delay = 300) {
    const [debounced, setDebounced] = useState(value);
 
-   useMemo(() => {
-      const t = setTimeout(() => setDebounced(value), delay);
-      return () => clearTimeout(t);
+   useEffect(() => {
+      const t = window.setTimeout(() => setDebounced(value), delay);
+      return () => window.clearTimeout(t);
    }, [value, delay]);
 
    return debounced;
@@ -34,7 +35,19 @@ type ToolModalState =
    | { mode: "edit"; tool: Tool }
    | null;
 
+const TOOL_STATUSES: ToolStatus[] = ["active", "expiring", "unused"];
+
+function parseStatus(value: string): ToolStatus | "all" {
+   if (value === "all") return "all";
+   if ((TOOL_STATUSES as readonly string[]).includes(value)) return value as ToolStatus;
+   return "all";
+}
+
 export default function ToolsCatalog() {
+   const searchParams = useSearchParams();
+   const urlQ = searchParams.get("q") ?? "";
+
+   // Pagination & filters (local UI state)
    const [page, setPage] = useState(1);
    const limit = 10;
 
@@ -43,34 +56,43 @@ export default function ToolsCatalog() {
    const [sortBy, setSortBy] = useState<ToolsSortBy>("updated_at");
    const [order, setOrder] = useState<SortOrder>("desc");
 
-   const [q, setQ] = useState("");
+   // Search input state:
+   const [q, setQ] = useState(urlQ);
    const debouncedQ = useDebouncedValue(q, 300);
 
-   const params = {
-      page,
-      limit,
-      sortBy,
-      order,
-      status: status === "all" ? undefined : status,
-      department: department === "all" ? undefined : department,
-      q: debouncedQ.trim() ? debouncedQ : undefined,
-   } as const;
+   // When user types / changes filters, we reset the page
+   function resetPage() {
+      setPage(1);
+   }
+
+   // Build query params for the server list
+   const params = useMemo(
+      () => ({
+         page,
+         limit,
+         sortBy,
+         order,
+         status: status === "all" ? undefined : status,
+         department: department === "all" ? undefined : department,
+         q: debouncedQ.trim() ? debouncedQ : undefined,
+      }),
+      [page, limit, sortBy, order, status, department, debouncedQ]
+   );
 
    const tools = useToolsList(params);
    const departments = useDepartments();
 
-   const totalPages = tools.data ? Math.max(1, Math.ceil(tools.data.total / tools.data.limit)) : 1;
-
-   function resetPage() {
-      setPage(1);
-   }
+   const totalPages = tools.data
+      ? Math.max(1, Math.ceil(tools.data.total / tools.data.limit))
+      : 1;
 
    // ---- Modal state (view/edit) ----
    const [modal, setModal] = useState<ToolModalState>(null);
    const closeModal = () => setModal(null);
 
-   // ---- Edit form state (minimal) ----
+   // ---- Edit mutation (modal handles its own form UI) ----
    const updateTool = useUpdateTool();
+
    const [, setEditMonthlyCost] = useState<number | "">("");
    const [, setEditStatus] = useState<ToolStatus>("active");
    const [, setEditName] = useState("");
@@ -92,21 +114,14 @@ export default function ToolsCatalog() {
       setModal({ mode: "edit", tool });
    }
 
-   const searchParams = useSearchParams();
-
-   useEffect(() => {
-      const urlQ = searchParams.get("q") ?? "";
-      setQ(urlQ);
-      setPage(1);
-   }, [searchParams]);
-
    return (
       <Card>
          <CardContent className="space-y-4">
             {/* Filters row */}
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="space-y-1">
+                  {/* Search: key={urlQ} ensures UI picks up global header search without an effect */}
+                  <div className="space-y-1" key={urlQ}>
                      <div className="text-xs text-muted">Search</div>
                      <Input
                         value={q}
@@ -124,7 +139,7 @@ export default function ToolsCatalog() {
                         className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm outline-none focus:ring-1"
                         value={status}
                         onChange={(e) => {
-                           setStatus(e.target.value as any);
+                           setStatus(parseStatus(e.target.value));
                            resetPage();
                         }}
                      >
@@ -180,6 +195,8 @@ export default function ToolsCatalog() {
                   <Button
                      variant="secondary"
                      onClick={() => {
+                        // Reset local UI state; URL q remains
+                        // header search still deep-links via /tools?q=...
                         setQ("");
                         setStatus("all");
                         setDepartment("all");
@@ -241,22 +258,17 @@ export default function ToolsCatalog() {
 
             {/* ---- Modals ---- */}
             {modal?.mode === "view" ? (
-               <ToolViewModal
-                  open={modal?.mode === "view"}
-                  tool={modal?.tool ?? null}
-                  onClose={closeModal}
-               />
+               <ToolViewModal open tool={modal.tool} onClose={closeModal} />
             ) : null}
 
             {modal?.mode === "edit" ? (
                <ToolEditModal
-                  open={modal?.mode === "edit"}
-                  tool={modal?.tool ?? null}
+                  open
+                  tool={modal.tool}
                   onClose={closeModal}
                   isSaving={updateTool.isPending}
                   isError={updateTool.isError}
                   onSave={(patch) => {
-                     if (!modal?.tool) return;
                      updateTool.mutate(
                         { id: modal.tool.id, patch },
                         { onSuccess: closeModal }
