@@ -4,11 +4,11 @@ import { StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Table, THead, TH, TR, TD } from "@/components/ui/Table";
 import { useToggleToolStatus, type Tool } from "../queries";
-
+import Image from "next/image";
+import { useState } from "react";
 
 const TOOL_COL_W = "w-[340px]";
 const ACTIONS_COL_W = "w-[170px]";
-
 
 function formatCurrencyEUR(value: unknown) {
    const n = typeof value === "number" ? value : Number(value);
@@ -24,6 +24,31 @@ function formatDate(value: unknown) {
    const d = new Date(String(value));
    if (Number.isNaN(d.getTime())) return "—";
    return d.toLocaleDateString();
+}
+
+function ToolIcon({ name, iconUrl }: { name: string; iconUrl?: string | null }) {
+   const [errored, setErrored] = useState(false);
+   const letter = (name?.trim()?.[0] ?? "—").toUpperCase();
+
+   if (!iconUrl || errored) {
+      return (
+         <span className="text-xs font-semibold text-muted">
+            {letter}
+         </span>
+      );
+   }
+
+   return (
+      <Image
+         src={iconUrl}
+         alt=""
+         width={32}
+         height={32}
+         className="object-contain p-1"
+         unoptimized
+         onError={() => setErrored(true)}
+      />
+   );
 }
 
 export default function ToolsTable({
@@ -123,20 +148,7 @@ export default function ToolsTable({
                               >
                                  <div className="flex items-center gap-3">
                                     <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-elevated">
-                                       <img
-                                          src={tool.icon_url}
-                                          alt=""
-                                          className="h-full w-full object-contain p-1"
-                                          loading="lazy"
-                                          onError={(e) => {
-                                             // fallback: hide broken img + show initial
-                                             e.currentTarget.style.display = "none";
-                                             const parent = e.currentTarget.parentElement;
-                                             if (!parent) return;
-                                             parent.classList.add("text-xs", "font-semibold", "text-muted");
-                                             parent.textContent = tool.name?.charAt(0) ?? "—";
-                                          }}
-                                       />
+                                       <ToolIcon name={tool.name} iconUrl={tool.icon_url} />
                                     </div>
 
                                     <div className="min-w-0 max-w-60">

@@ -1,7 +1,7 @@
 export const queryKeys = {
    tools: {
       all: ["tools"] as const,
-      list: (params?: Record<string, any>) =>
+      list: (params?: Record<string, unknown>) =>
          ["tools", "list", params] as const,
       detail: (id: number) =>
          ["tools", "detail", id] as const,
