@@ -1,12 +1,12 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import ToolsCatalog from "@/features/tools/components/ToolsCatalog";
 
-export default function ToolsPageClient() {
-   const searchParams = useSearchParams();
-   const q = searchParams.get("q") ?? "";
+type ToolsPageClientProps = {
+   initialQuery: string;
+};
 
+export default function ToolsPageClient({ initialQuery }: ToolsPageClientProps) {
    return (
       <div className="space-y-6">
          <div>
@@ -16,7 +16,7 @@ export default function ToolsPageClient() {
             </p>
          </div>
 
-         <ToolsCatalog key={`q=${q}`} initialQuery={q} />
+         <ToolsCatalog key={`q=${initialQuery}`} initialQuery={initialQuery} />
       </div>
    );
 }
