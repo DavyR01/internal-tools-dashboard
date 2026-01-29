@@ -138,7 +138,7 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
 
 
    return (
-      <header className="sticky top-0 z-[50] border-b border-border backdrop-blur bg-surface">
+      <header className="sticky top-0 z-50 border-b border-border backdrop-blur bg-surface">
          <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-2 px-3 md:gap-3 md:px-4">
             {/* Mobile */}
             <button

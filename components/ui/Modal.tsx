@@ -17,7 +17,7 @@ export function Modal({
    if (!open) return null;
 
    return (
-      <div className="fixed inset-0 z-[50]">
+      <div className="fixed inset-0 z-50">
          {/* backdrop (visual only) */}
          <div className="absolute inset-0 bg-black/70" aria-hidden="true" />
 

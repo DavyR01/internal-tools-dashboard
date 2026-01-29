@@ -44,7 +44,7 @@ function SearchModalContent({
       <div className="lg:hidden" aria-hidden={false}>
          {/* Backdrop */}
          <div
-            className="fixed inset-0 z-[100] bg-black/50 opacity-100 transition-opacity duration-200"
+            className="fixed inset-0 z-100 bg-black/50 opacity-100 transition-opacity duration-200"
             aria-hidden="true"
             onClick={onClose}
          />
@@ -55,7 +55,7 @@ function SearchModalContent({
             role="dialog"
             aria-modal="true"
             className={cn(
-               "fixed left-1/2 top-24 z-[110] w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg",
+               "fixed left-1/2 top-24 z-110 w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg",
                "opacity-100 scale-100 transition duration-200 ease-out will-change-transform will-change-opacity"
             )}
             onClick={(e) => e.stopPropagation()}

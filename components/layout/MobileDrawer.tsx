@@ -56,7 +56,7 @@ function MobileDrawerContent({
       <div className={cn("md:hidden")} aria-hidden={false}>
          {/* Backdrop */}
          <div
-            className="fixed inset-0 z-[100] bg-black/50 opacity-100 transition-opacity duration-200"
+            className="fixed inset-0 z-100 bg-black/50 opacity-100 transition-opacity duration-200"
             aria-hidden="true"
             onClick={onClose}
          />
@@ -67,7 +67,7 @@ function MobileDrawerContent({
             role="dialog"
             aria-modal="true"
             className={cn(
-               "fixed left-0 top-0 z-[110] h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg",
+               "fixed left-0 top-0 z-110 h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg",
                "translate-x-0 transition-transform duration-200 ease-out will-change-transform"
             )}
             onClick={(e) => e.stopPropagation()}
