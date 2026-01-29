@@ -22,17 +22,18 @@ export default function ToolEditModal({
    isError: boolean;
 }) {
    // Important: if the modal is closed or tool is missing, do not mount it.
-   if (!open || !tool) return null;
 
    // Initialize form state from the current tool *on mount*.
-   const [name, setName] = useState(() => tool.name ?? "");
+   const [name, setName] = useState(() => tool?.name ?? "");
    const [monthlyCost, setMonthlyCost] = useState<number | "">(() =>
-      typeof tool.monthly_cost === "number" ? tool.monthly_cost : ""
+      typeof tool?.monthly_cost === "number" ? tool?.monthly_cost : ""
    );
-   const [status, setStatus] = useState<ToolStatus>(() => tool.status);
+   const [status, setStatus] = useState<ToolStatus>(() => tool?.status ?? "active");
 
    // Lightweight "dirty" detection if you later want to disable Save unless changes.
    const canSave = useMemo(() => !isSaving, [isSaving]);
+
+   if (!open || !tool) return null;
 
    return (
       <Modal open title="Edit tool" onClose={onClose}>
