@@ -2,7 +2,8 @@
 
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils/cn";
 
 type SearchModalProps = {
    open: boolean;
@@ -24,17 +25,28 @@ export default function SearchModal({
 }: SearchModalProps) {
    const [value, setValue] = useState(initialValue);
 
-   if (!open) return null;
+   // Keep input in sync when opening the modal with a new initialValue.
+   useEffect(() => {
+      if (!open) return;
+      setValue(initialValue);
+   }, [open, initialValue]);
 
-   
    return (
       <Portal>
-         <div className="lg:hidden">
+         <div
+            className={cn(
+               "lg:hidden",
+               open ? "pointer-events-auto" : "pointer-events-none"
+            )}
+            aria-hidden={!open}
+         >
             {/* Backdrop */}
-            <button
-               type="button"
-               className="fixed inset-0 z-[100] bg-black/50"
-               aria-label="Close search"
+            <div
+               className={cn(
+                  "fixed inset-0 z-[100] bg-black/50 transition-opacity duration-200",
+                  open ? "opacity-100" : "opacity-0"
+               )}
+               aria-hidden="true"
                onClick={onClose}
             />
 
@@ -43,7 +55,12 @@ export default function SearchModal({
                id="search-modal"
                role="dialog"
                aria-modal="true"
-               className="fixed left-1/2 top-24 z-[110] w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg"
+               className={cn(
+                  "fixed left-1/2 top-24 z-[110] w-[92vw] max-w-md -translate-x-1/2 rounded-xl border border-border bg-surface p-4 shadow-lg",
+                  "transition duration-200 ease-out will-change-transform will-change-opacity",
+                  open ? "opacity-100 scale-100" : "opacity-0 scale-95"
+               )}
+               onClick={(e) => e.stopPropagation()}
             >
                <div className="flex items-center gap-2">
                   <div className="text-sm font-semibold">Search</div>
@@ -67,7 +84,7 @@ export default function SearchModal({
                   <input
                      id="modal-search"
                      aria-label="Search tools"
-                     autoFocus
+                     autoFocus={open}
                      value={value}
                      onChange={(e) => setValue(e.target.value)}
                      onKeyDown={(e) => {

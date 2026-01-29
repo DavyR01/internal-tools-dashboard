@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils/cn";
 
 type NavItem = {
    label: string;
@@ -16,7 +17,7 @@ type MobileDrawerProps = {
    onClose: () => void;
    pathname: string;
    navItems: NavItem[];
-   onSearch: (q: string) => void
+   onSearch: (q: string) => void;
 };
 
 function Portal({ children }: { children: React.ReactNode }) {
@@ -29,20 +30,26 @@ export default function MobileDrawer({
    onClose,
    pathname,
    navItems,
-   onSearch
+   onSearch,
 }: MobileDrawerProps) {
    const [query, setQuery] = useState("");
 
-   if (!open) return null;
-
    return (
       <Portal>
-         <div className="md:hidden">
+         <div
+            className={cn(
+               "md:hidden",
+               open ? "pointer-events-auto" : "pointer-events-none"
+            )}
+            aria-hidden={!open}
+         >
             {/* Backdrop */}
-            <button
-               type="button"
-               className="fixed inset-0 z-[100] bg-black/50"
-               aria-label="Close menu"
+            <div
+               className={cn(
+                  "fixed inset-0 z-[100] bg-black/50 transition-opacity duration-200",
+                  open ? "opacity-100" : "opacity-0"
+               )}
+               aria-hidden="true"
                onClick={onClose}
             />
 
@@ -51,7 +58,12 @@ export default function MobileDrawer({
                id="mobile-nav"
                role="dialog"
                aria-modal="true"
-               className="fixed left-0 top-0 z-[110] h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg"
+               className={cn(
+                  "fixed left-0 top-0 z-[110] h-dvh w-[85vw] max-w-sm border-r border-border bg-surface p-4 shadow-lg",
+                  "transition-transform duration-200 ease-out will-change-transform",
+                  open ? "translate-x-0" : "-translate-x-4 -translate-x-full"
+               )}
+               onClick={(e) => e.stopPropagation()}
             >
                <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500" />
