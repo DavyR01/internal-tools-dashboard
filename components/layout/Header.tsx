@@ -42,10 +42,11 @@ type HeaderInnerProps = {
 };
 
 function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
+   // Infra
    const router = useRouter();
-
    const isClient = useIsClient();
 
+   // State
    const [dark, setDark] = useState<boolean>(() => {
       if (typeof window === "undefined") return false;
       return document.documentElement.classList.contains("dark");
@@ -53,14 +54,18 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
 
    const [mobileOpen, setMobileOpen] = useState(false);
    const [searchOpen, setSearchOpen] = useState(false);
-
    const [query, setQuery] = useState(initialQuery);
 
+   // Refs
+   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+   // Memoized callbacks
    const closeOverlays = useCallback(() => {
       setMobileOpen(false);
       setSearchOpen(false);
    }, []);
 
+   // Handlers
    function toggleTheme() {
       setDark((prev) => {
          const next = !prev;
@@ -72,6 +77,19 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
          return next;
       });
    }
+
+   function submitSearch(raw?: string) {
+      const q = (raw ?? query).trim();
+      const href = q ? `/tools?q=${encodeURIComponent(q)}` : "/tools";
+
+      // Ask the next Header instance to restore focus
+      sessionStorage.setItem("headerSearchFocus", "1");
+
+      router.push(href);
+      setSearchOpen(false);
+   }
+
+   // Effects (side effects / subscriptions only)
 
    // Apply + persist theme (external side-effects only)
    useEffect(() => {
@@ -93,8 +111,7 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
       const prevOverflow = body.style.overflow;
       const prevPaddingRight = body.style.paddingRight;
 
-      const scrollbarWidth =
-         window.innerWidth - document.documentElement.clientWidth;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
       body.style.overflow = "hidden";
       if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
@@ -106,19 +123,7 @@ function HeaderInner({ pathname, initialQuery }: HeaderInnerProps) {
       };
    }, [mobileOpen, searchOpen, closeOverlays]);
 
-   const searchInputRef = useRef<HTMLInputElement | null>(null);
-
-   function submitSearch(raw?: string) {
-      const q = (raw ?? query).trim();
-      const href = q ? `/tools?q=${encodeURIComponent(q)}` : "/tools";
-
-      // Ask the next Header instance to restore focus
-      sessionStorage.setItem("headerSearchFocus", "1");
-
-      router.push(href);
-      setSearchOpen(false);
-   }
-
+   // Restore focus after navigation across remount
    useEffect(() => {
       const shouldFocus = sessionStorage.getItem("headerSearchFocus") === "1";
       if (!shouldFocus) return;
