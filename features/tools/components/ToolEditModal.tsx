@@ -1,13 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { Tool, ToolStatus } from "../queries";
 
-type ToolPatch = Partial<Pick<Tool, "name" | "monthly_cost" | "status" | "active_users_count">>;
+type ToolPatch = Partial<
+   Pick<Tool, "name" | "monthly_cost" | "status" | "active_users_count">
+>;
 
 export default function ToolEditModal({
    open,
@@ -24,20 +25,21 @@ export default function ToolEditModal({
    isSaving: boolean;
    isError: boolean;
 }) {
-   // Important: if the modal is closed or tool is missing, do not mount it.
-   if (!open || !tool) return null;
-
-   // Initialize form state from the current tool *on mount*.
-   const [name, setName] = useState(() => tool.name ?? "");
+   
+   // Hooks MUST be called unconditionally (even when modal is closed).
+   // State is initialized from the tool only on mount.
+   const [name, setName] = useState(() => tool?.name ?? "");
    const [monthlyCost, setMonthlyCost] = useState<number | "">(() =>
-      typeof tool.monthly_cost === "number" ? tool.monthly_cost : ""
+      typeof tool?.monthly_cost === "number" ? tool.monthly_cost : ""
    );
    const [users, setUsers] = useState<number | "">(() =>
-      typeof tool.active_users_count === "number" ? tool.active_users_count : ""
+      typeof tool?.active_users_count === "number" ? tool.active_users_count : ""
    );
-   const [status, setStatus] = useState<ToolStatus>(() => tool.status ?? "active");
+   const [status, setStatus] = useState<ToolStatus>(() => tool?.status ?? "active");
 
    const canSave = useMemo(() => !isSaving, [isSaving]);
+
+   if (!open || !tool) return null;
 
    const nameId = "tool-edit-name";
    const monthlyCostId = "tool-edit-monthly-cost";
@@ -67,7 +69,6 @@ export default function ToolEditModal({
                   id={monthlyCostId}
                   className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
-                  inputMode="numeric"
                   value={monthlyCost}
                   onChange={(e) =>
                      setMonthlyCost(e.target.value === "" ? "" : Number(e.target.value))
@@ -83,7 +84,6 @@ export default function ToolEditModal({
                   id={usersId}
                   className="h-10 w-full rounded-xl border border-muted/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring/30"
                   type="number"
-                  inputMode="numeric"
                   min={0}
                   value={users}
                   onChange={(e) => setUsers(e.target.value === "" ? "" : Number(e.target.value))}
@@ -117,7 +117,6 @@ export default function ToolEditModal({
                <Button variant="secondary" onClick={onClose} disabled={isSaving}>
                   Cancel
                </Button>
-
                <Button
                   onClick={() =>
                      onSave({
