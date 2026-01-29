@@ -31,6 +31,19 @@ http://localhost:3000
 
 ---
 
+## 🧱 Tech Stack
+
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS
+- **Data fetching**: Axios + TanStack Query
+- **Charts**: Recharts
+- **Icons**: Lucide Icons
+- **Testing**: Jest + React Testing Library
+- **Linting**: ESLint (strict rules)
+
+---
+
 ## 🏗️ Architecture
 
 L’architecture a été pensée pour être **simple, lisible et maintenable**, en respectant les bonnes pratiques attendues pour un outil interne professionnel.
